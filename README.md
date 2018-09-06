@@ -95,7 +95,7 @@ We want to have a feeling of the sentiment when people are posting about Hortonw
     - text: $.text
     - url: $.url
     
-    ![EavluateJsonPath properties](images/evaluatejsonpathproperties.png)
+    ![EvaluateJsonPath properties](images/evaluatejsonpathproperties.png)
 
 - Step 4: Add a AttributeToJSON connector to the canvas and link from EvaluateJsonPath on **matched** relationship
   - Double click on the processor
