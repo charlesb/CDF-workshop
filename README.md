@@ -193,7 +193,7 @@ ALTER TABLE workshop.druid_demo SET TBLPROPERTIES('druid.kafka.ingestion' = 'STA
 
 ![Image of zeppelin create table](images/zeppelin_create_table.png)
 
-## Stream data into Hive/Druid using NiFi
+## Stream data into Hive using NiFi
 
 First we are going to stop and disable some processors from the previous Flow
 
