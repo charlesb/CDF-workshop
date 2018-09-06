@@ -42,11 +42,11 @@ It can take up to 18 minutes...
 
 ### SSH to the sandbox
 
-Download either the [ppk](keys/hdp-workshop.ppk) or [pem](keys/hdp-workshop.pem) private key whether you are using Windows or Mac
+Copy and paste the content of [ppk](keys/hdp-workshop.ppk) for Windows or [pem](keys/hdp-workshop.pem) for Mac OS X
 
 On Mac use the terminal to SSH
 
-For Mac users, don't forget to ```chmod 400 /path/to/hdp-workshop.ppk``` before ssh'ing
+For Mac users, don't forget to ```chmod 400 /path/to/hdp-workshop.pem``` before ssh'ing
 
 ![Image of Mac terminal ssh](images/mac_terminal_ssh.png)
 
@@ -58,7 +58,70 @@ On Windows use [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest
 
 ## Stream data using NiFi
 
-Visit [NiFi](http://demo.hortonworks.com:9090/nifi/)
+Open [NiFi](http://demo.hortonworks.com:9090/nifi/) UI
+
+### Get social media sentiment analysis
+
+For the purpose of this exercise we are going to use the [Social Searcher](https://www.social-searcher.com/) monitoring tool.
+
+The API documentation can be found [here](https://www.social-searcher.com/api-v2/)
+
+To get started we need to get the data from the Social Media REST API, extract what we need and save it to a file
+
+We want to have a feeling of the sentiment when people are posting about Hortonworks on Facebook and Twitter
+
+- Step 1: Add a InvokeHTTP processor to the canvas
+  - Double click on the processor
+  - On settings tab, check all relationships except **Response**
+  - On scheduling tab, set Run Schedule to 30 sec
+  - Go to properties tab and add the **Remote URL** value: ```https://api.social-searcher.com/v2/search?q=Hortonworks&network=facebook,twitter&limit=20```
+  - Apply changes
+  
+- Step 2: Add a SplitJson connector to the canvas and link from InvokeHttp on **Response** relationship
+  - Double click on the processor
+  - On settings tab, check both **failure** and **original** relationships
+  - On properties tab give **JsonPath Expression** the value: **$.posts**
+  - Apply changes
+  
+- Step 3: Add EvaluateJsonPath to the canvas and link from SplitJson on **split** relationship
+  - Double click on the processor
+  - On settings tab, check both **failure** and **unmatched** relationships
+  - On properties tab
+  - Change **Destination** value to **flowfile-attribute**
+  - Add properties as follow
+    - network: $.network
+    - time: $.posted
+    - sentiment: $.sentiment
+    - text: $.text
+    - url: $.url
+    
+    ![EavluateJsonPath properties](images/evaluatejsonpathproperties.png)
+
+- Step 4: Add a AttributeToJSON connector to the canvas and link from EvaluateJsonPath on **matched** relationship
+  - Double click on the processor
+  - On settings tab, check **failure** relationship
+  - Change **Destination** value to **flowfile-content**
+  - Change **Attribute List** value to **network,time,sentiment,text,url**
+  - Apply changes
+  
+- Step 5: Add a MergeContent connector to the canvas and link from AttributeToJSON on **success** relationship
+  - Double click on the processor
+  - On settings tab, check both **failure** and **original** relationships
+  - Apply changes
+  
+- Step 6: Add a PutFile connector to the canvas and link from MergeContent on **merge** relationship
+  - Double click on the processor
+  - On settings tab, check all relationships
+  - Change **Directory** value to **/tmp/socialmedia**
+  - Change **Attribute List** value to **network,time,sentiment,text,url**
+  - Change **Conflict Resolution Strategy** value to **replace**
+  - Apply changes
+  
+- Step 7: Start the entire flowfile
+
+![NiFi Flow 1](images/flow1.png)
+
+Explore the file created under /tmp/socialmedia
 
 ## Query datasets using Zeppelin
 
