@@ -1,4 +1,4 @@
-# HDP/HDF Labs
+# HDP/HDF Labs: Real-time social media sentiment analysis with NiFi, Kafka and Druid
 
 Content
 
@@ -60,7 +60,7 @@ On Windows use [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest
 
 Open [NiFi](http://demo.hortonworks.com:9090/nifi/) UI
 
-### Get social media sentiment analysis
+### Get social media sentiment analysis: let's see what people think about Hortonworks :)
 
 For the purpose of this exercise we are going to use the [Social Searcher](https://www.social-searcher.com/) monitoring tool.
 
@@ -117,7 +117,7 @@ We want to have a feeling of the sentiment when people are posting about Hortonw
   - Change **Conflict Resolution Strategy** value to **replace**
   - Apply changes
   
-- Step 7: Start the entire flowfile
+- Step 7: Start the entire flow
 
 ![NiFi Flow 1](images/flow1.png)
 
@@ -141,9 +141,11 @@ List topics to check that it's been created
 
 ```./bin/kafka-topics.sh --list --zookeeper demo.hortonworks.com:2181```
 
-Open a consumer to verify that JSON record will stream to this topic later
+Open a consumer so later we can monitor and verify that JSON records will stream through this topic
 
 ```./bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic druid_demo```
+
+Keep the terminal open
 
 ## Create a Hive table using Druid as storage engine
 
@@ -165,11 +167,10 @@ create database workshop;
 Create the Hive table backed by Druid storage where the social medias sentiment analysis will be streamed into
 
 ```SQL
-CREATE EXTERNAL TABLE workshop.druid_demo (
+CREATE EXTERNAL TABLE workshop.sentiment_analysis (
 `__time` timestamp,
-`host` string,
-`avgPacketsPerSecond` float,
-`avgBytesPerSecond` float
+`network` string,
+`sentiment` string
 )
 STORED BY 'org.apache.hadoop.hive.druid.DruidStorageHandler'
 TBLPROPERTIES (
@@ -200,11 +201,37 @@ First we are going to stop and disable some processors from the previous Flow
   
 - Step 2: Format post time to comply with [ISO format](https://en.wikipedia.org/wiki/ISO_8601) (Druid requirement)
   - Add UpdateAttribute processor between EvaluateJSonPath and AttributesToJSON processors
+  - Using handy [NiFi's language expression](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html#dates), add a new attribue ```__time``` with value: ```${time:toDate("yyyy-MM-dd HH:mm:ss '+00000'", "GMT"):format("yyyy-MM-dd'T'HH:mm:ss'Z'", "Asia/Singapore")}```
+
+- Step 3: Modify existing AttributesToJSON processor to stream new attribute ```__time```
+  - Double click on processor
+  - On settings tab, check **failure** relationship
+  -  Go to properties tab
+  - Replace ```network,time,sentiment,text,url``` in the Attributes List with ```network,__time,sentiment```
+  - Apply changes
+  
+- Step 4: Add a **PublishKafkaRecord_1_0** connector to the canvas and link from AttributesToJSON on **success** relationship
+  - Double click on the processor
+  - On settings tab, check all relationships
+  - On properties tab
+  - Change **Kafka Brokers** value to **demo.hortonworks.com:6667**
+  - Change **Topic Name** value to **druid_demo**
+  - Change **Use Transactions** value to **false**
+  - Apply changes
+  
+- Step 5: Start the entire flow
 	
+The overall flow should look like this
 
-${time_end:multiply(1000):format("yyyy-MM-dd'T'HH:mm:ss'Z'", "Asia/Singapore")}
+![NiFi Flow 2](images/nifi_stream_to_kafka.png)
 
+You should be able to see records streaming through Kafka looking at the terminal with Kafka consumer opened earlier
 
+![Kafka topic consumer](images/kafka_topic_consumer.png)
+
+Going back to Zeppelin, we can query the data streamed in real-time
+
+![Kafka topic consumer](images/zeppelin_monitor_sentiment_analysis.png)
 
 
 
