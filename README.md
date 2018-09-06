@@ -1,6 +1,6 @@
-# HDP/HDF Labs: Real-time social media sentiment analysis with NiFi, Kafka and Druid
+# HDP & HDF Labs: Real-time social media sentiment analysis with NiFi, Kafka, Druid and Zeppelin
 
-Content
+## Content
 
 * [Lab 1 - Accessing the sandbox](#accessing-the-sandbox)
 * [Lab 2 - Stream data using NiFi](#stream-data-using-nifi)
@@ -70,6 +70,8 @@ The API documentation can be found [here](https://www.social-searcher.com/api-v2
 To get started we need to get the data from the Social Media REST API, extract what we need and save it to a file
 
 We want to have a feeling of the sentiment when people are posting about Hortonworks on Facebook and Twitter
+
+### Build NiFi flow
 
 - Step 1: Add a InvokeHTTP processor to the canvas
   - Double click on the processor
