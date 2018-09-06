@@ -190,7 +190,7 @@ TBLPROPERTIES (
 Start Druid indexing
 
 ```SQL
-ALTER TABLE workshop.druid_demo SET TBLPROPERTIES('druid.kafka.ingestion' = 'START');
+ALTER TABLE workshop.sentiment_analysis SET TBLPROPERTIES('druid.kafka.ingestion' = 'START');
 ```
 
 ![Image of zeppelin create table](images/zeppelin_create_table.png)
