@@ -4,8 +4,9 @@ Content
 
 * [Lab 1 - Accessing the sandbox](#accessing-the-sandbox)
 * [Lab 2 - Stream data using NiFi](#stream-data-using-nifi)
-* [Lab 3 - Query datasets using Zeppelin](#query datasets using Zeppelin)
-* [Lab 4 - Analyze the datasets using SQL](#analyze-the-datasets-using-sql)
+* [Lab 3 - Explore Kafka](#explore-kafka)
+* [Lab 4 - Explore Hive, Druid and Zeppelin](#explore-hive-druid-and-zeppelin)
+* [Lab 5 - Stream data into Hive using NiFi](#stream-data-into-hive-using-nifi)
 
 ## Accessing the sandbox
 
@@ -123,7 +124,7 @@ We want to have a feeling of the sentiment when people are posting about Hortonw
 
 Explore the file created under /tmp/socialmedia
 
-## Create a Kafka topic
+## Explore Kafka
 
 ssh to the AWS instance as explained above then become root
 
@@ -147,7 +148,7 @@ Open a consumer so later we can monitor and verify that JSON records will stream
 
 Keep the terminal open
 
-## Create a Hive table using Druid as storage engine
+## Explore Hive, Druid and Zeppelin
 
 Visit [Zeppelin](http://demo.hortonworks.com:9995/)
 And log in as admin (password: admin)
