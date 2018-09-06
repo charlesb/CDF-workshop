@@ -123,21 +123,48 @@ We want to have a feeling of the sentiment when people are posting about Hortonw
 
 Explore the file created under /tmp/socialmedia
 
-## Query datasets using Zeppelin
+## Create a Kafka topic
 
-Visit [Zeppelin](http://demo.hortonworks.com:9995/) 
+ssh to the AWS instance as explained above then become root
 
+```sudo su -```
+
+Navigate to Kafka
+
+```cd /usr/hdp/current/kafka-broker```
+
+Create a topic named druid_demo
+
+```./bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic druid_demo```
+
+List topics to check that it's been created
+
+```./bin/kafka-topics.sh --list --zookeeper demo.hortonworks.com:2181```
+
+Open a consumer to verify that JSON record will stream to this topic later
+
+```./bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic druid_demo```
+
+## Create a Hive table using Druid as storage engine
+
+Visit [Zeppelin](http://demo.hortonworks.com:9995/)
 And log in as admin (password: admin)
 
-su - sudo
-cd /usr/hdp/current/kafka-broker
-./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic druid_demo
+Create a new notebook called Demo (use jdbc as default interpreter)
 
-beeline -u "jdbc:hive2://demo.hortonworks.com:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2-interactive" -n admin
+Add the interpreter to connect to Hive LLAP
 
+```%jdbc(hive_interactive)```
 
-set hive.druid.metadata.uri=jdbc:mysql://localhost:3306/druid;
+Create a database named workshop and run the SQL
 
+```SQL
+create database workshop;
+```
+
+Create the Hive table backed by Druid storage where the social medias sentiment analysis will be streamed into
+
+```SQL
 CREATE EXTERNAL TABLE workshop.druid_demo (
 `__time` timestamp,
 `host` string,
@@ -154,21 +181,28 @@ TBLPROPERTIES (
 "druid.kafka.ingestion.period" = "PT1S",
 "druid.kafka.ingestion.consumer.retries" = "2"
 );
+```
 
+Start Druid indexing
 
+```SQL
 ALTER TABLE workshop.druid_demo SET TBLPROPERTIES('druid.kafka.ingestion' = 'START');
+```
 
-cd /usr/hdp/current/kafka-broker
+![Image of zeppelin create table](images/zeppelin_create_table.png)
 
-./bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic druid_demo
+## Stream data into Hive/Druid using NiFi
 
+First we are going to stop and disable some processors from the previous Flow
 
-./bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic druid_demo
+- Step 1: Disable unnecessary processors
+  - Right click and disable MergeContent and PutFile processors
+  
+- Step 2: Format post time to comply with [ISO format](https://en.wikipedia.org/wiki/ISO_8601) (Druid requirement)
+  - Add UpdateAttribute processor between EvaluateJSonPath and AttributesToJSON processors
+	
 
-
-https://api.social-searcher.com/v2/search?q=%22obama%22&network=facebook,twitter&limit=100
-https://www.social-searcher.com/api-v2/
-https://community.hortonworks.com/articles/193945/social-media-monitoring-with-nifi-hivedruid-integr.html
+${time_end:multiply(1000):format("yyyy-MM-dd'T'HH:mm:ss'Z'", "Asia/Singapore")}
 
 
 
