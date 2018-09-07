@@ -1,4 +1,4 @@
-# HDP & HDF Labs: Real-time social media sentiment analysis with NiFi, Kafka, Druid and Zeppelin
+# HDP & HDF Labs: Real-time social media sentiment analysis with NiFi, Kafka, Druid, Zeppelin and Superset
 
 ## Prerequisite
 
@@ -16,6 +16,7 @@
 * [Lab 3 - Explore Kafka](#explore-kafka)
 * [Lab 4 - Explore Hive, Druid and Zeppelin](#explore-hive-druid-and-zeppelin)
 * [Lab 5 - Stream data into Hive using NiFi](#stream-data-into-hive-using-nifi)
+* [Lab 6 - Create live dashboard with Superset](#create-live-dashboard-with-superset)
 
 ## Accessing the sandbox
 
@@ -247,8 +248,25 @@ Going back to Zeppelin, we can query the data streamed in real-time
 
 ![Kafka topic consumer](images/zeppelin_monitor_sentiment_analysis.png)
 
+## Create live dashboard with Superset
 
+Go to [Superset UI](http://demo.hortonworks.com:9088/)
 
+Log in with user **admin** and password **superset**
+
+Refresh Druid metadata
+
+![Refresh druid metadata](images/superset_refresh_datasources.png)
+
+Edit the datasource record and verify that the columns are listed, same for the metric (you might need to scroll down)
+
+![Druid datasource columns](images/druid_datasource_columns)
+
+Click on the datasource and create the following dashboard
+
+![Druid datasource columns](images/druid_dashboard)
+
+Play with other visualization types
 
 
 
