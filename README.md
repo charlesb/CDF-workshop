@@ -2,7 +2,7 @@
 
 ## Prerequisite
 
-- Launch AMI ami-03302dad17fa68071 with m5d.4xlarge instance type
+- Launch AWS AMI **ami-03302dad17fa68071** with **m5d.4xlarge** instance type
 - Keep default storage (300GB SSD)
 - Set security group with:
   - Type: All TCP
