@@ -1,5 +1,14 @@
 # HDP & HDF Labs: Real-time social media sentiment analysis with NiFi, Kafka, Druid and Zeppelin
 
+## Prerequisite
+
+- Launch AMI ami-03302dad17fa68071 with m5d.4xlarge instance type
+- Keep default storage (300GB SSD)
+- Set security group with:
+  - Type: All TCP
+  - Source: My IP
+- Choose an existing or create a new key pair
+
 ## Content
 
 * [Lab 1 - Accessing the sandbox](#accessing-the-sandbox)
