@@ -260,11 +260,11 @@ Refresh Druid metadata
 
 Edit the datasource record and verify that the columns are listed, same for the metric (you might need to scroll down)
 
-![Druid datasource columns](images/druid_datasource_columns)
+![Druid datasource columns](images/druid_datasource_columns.png)
 
 Click on the datasource and create the following dashboard
 
-![Druid datasource columns](images/druid_dashboard)
+![Druid datasource columns](images/druid_dashboard.png)
 
 Play with other visualization types
 
