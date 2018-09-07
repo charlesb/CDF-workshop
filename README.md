@@ -202,6 +202,8 @@ Start Druid indexing
 ALTER TABLE workshop.sentiment_analysis SET TBLPROPERTIES('druid.kafka.ingestion' = 'START');
 ```
 
+Verify that supervisor and indexing task are running from the [Druid overload console](http://demo.hortonworks.com:8090/console.html)
+
 ![Image of zeppelin create table](images/zeppelin_create_table.png)
 
 ## Stream data into Hive using NiFi
