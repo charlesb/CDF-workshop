@@ -126,7 +126,6 @@ We want to have a feeling of the sentiment when people are posting about Hortonw
   - Double click on the processor
   - On settings tab, check all relationships
   - Change **Directory** value to **/tmp/socialmedia**
-  - Change **Attribute List** value to **network,time,sentiment,text,url**
   - Change **Conflict Resolution Strategy** value to **replace**
   - Apply changes
   
