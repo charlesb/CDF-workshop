@@ -119,6 +119,7 @@ Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and 
 - Step 2: Add a UpdateAttribute connector to the canvas and link from ConnectWebSocket on **text message** relationship
   - Double click on the processor
   - On properties tab add new property **mime.type** clicking on + icon and give the value **application/json**. This will tell the rest of of the flow that the messages sent by the Meetup WebSocket is in JSON format.
+  - Add another property **event** to set an event name **HDF workshop** for the purpose of this exercise
   - Apply changes
   
   ![UpdateAtrribute 1 properties](images/updateattibute1properties.png)
@@ -209,6 +210,7 @@ Create the Hive table backed by Druid storage where the social medias sentiment 
 ```SQL
 CREATE EXTERNAL TABLE workshop.meetup_comment_sentiment (
 `__time` timestamp,
+`event` string,
 `member` string,
 `comment` string,
 `sentiment` string
@@ -277,7 +279,7 @@ Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the step
   - Double click on processor
   - On settings tab, check **failure** relationship
   - Go to properties tab
-  - In the Attributes List value set ```__time, comment, member, sentiment``` to match the previously created Hive table
+  - In the Attributes List value set ```__time, event, comment, member, sentiment``` to match the previously created Hive table
   - Change Destination to **flowfile-content**
   - Set Include Core Attributes to **false**
   - Apply changes
@@ -315,7 +317,7 @@ Refresh Druid metadata
 
 ![Refresh druid metadata](images/superset_refresh_datasources.png)
 
-Edit the datasource record and verify that the columns are listed, same for the metric (you might need to scroll down)
+Edit the **meetup_comment_sentiment** datasource record and verify that the columns are listed, same for the metric (you might need to scroll down)
 
 ![Druid datasource columns](images/druid_datasource_columns.png)
 
