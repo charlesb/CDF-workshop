@@ -104,18 +104,24 @@ In this scenario we are going to stream all comments into NiFi and find out scor
 
 Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the steps below:
 
-- Step 1: Add a InvokeHTTP processor to the canvas
+- Step 1: Add a ConnectWebSocket processor to the canvas
   - Double click on the processor
-  - On settings tab, check all relationships except **Response**
-  - On scheduling tab, set Run Schedule to 30 sec
-  - Go to properties tab and add the **Remote URL** value: ```https://api.social-searcher.com/v2/search?q=Hortonworks&network=facebook,twitter&limit=20```
+  - On settings tab, check all relationships except **text message**
+  - Got to properties tab and select or create **JettyWebSocketClient** as the WebSocket Client ControllerService
+  - The configure the service clicking on the arrow on the right
+  - If the service is already enable, disable it first click on the thunder icon, then configure it
+  	- Add this value: ```ws://stream.meetup.com/2/event_comments``` to property **WebSocket URI**
+  	- Apply the change
+  	- Enable the controller service and close the window
+  - Go to properties tab and give a value to **WebSocket Client Id** such as **demo** for example
   - Apply changes
   
-- Step 2: Add a SplitJson connector to the canvas and link from InvokeHttp on **Response** relationship
+- Step 2: Add a UpdateAttribute connector to the canvas and link from ConnectWebSocket on **text message** relationship
   - Double click on the processor
-  - On settings tab, check both **failure** and **original** relationships
-  - On properties tab give **JsonPath Expression** the value: **$.posts**
+  - On properties tab add new property **mime.type** clicking on + icon and give the value **application/json**. This will tell the rest of of the flow that the messages send by the Meetup WebSocket is in JSON format.
   - Apply changes
+  
+  ![UpdateAtrribute 1 properties](images/updateattibute1properties.png)
   
 - Step 3: Add EvaluateJsonPath to the canvas and link from SplitJson on **split** relationship
   - Double click on the processor
