@@ -175,7 +175,7 @@ Navigate to Kafka
 
 Create a topic named druid_demo
 
-```./bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic druid_demo```
+```./bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic meetup_comment_ws```
 
 List topics to check that it's been created
 
@@ -183,7 +183,7 @@ List topics to check that it's been created
 
 Open a consumer so later we can monitor and verify that JSON records will stream through this topic
 
-```./bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic druid_demo```
+```./bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_comment_ws```
 
 Keep the terminal open
 
@@ -201,13 +201,13 @@ Add the interpreter to connect to Hive LLAP
 Create a database named workshop and run the SQL
 
 ```SQL
-create database workshop;
+CREATE DATABASE workshop;
 ```
 
 Create the Hive table backed by Druid storage where the social medias sentiment analysis will be streamed into
 
 ```SQL
-CREATE EXTERNAL TABLE workshop.sentiment_analysis (
+CREATE EXTERNAL TABLE workshop.meetup_comment_sentiment (
 `__time` timestamp,
 `member` string,
 `comment` string,
@@ -216,7 +216,7 @@ CREATE EXTERNAL TABLE workshop.sentiment_analysis (
 STORED BY 'org.apache.hadoop.hive.druid.DruidStorageHandler'
 TBLPROPERTIES (
 "kafka.bootstrap.servers" = "demo.hortonworks.com:6667",
-"kafka.topic" = "druid_demo",
+"kafka.topic" = "meetup_comment_ws",
 "druid.kafka.ingestion.useEarliestOffset" = "true",
 "druid.kafka.ingestion.maxRowsInMemory" = "5",
 "druid.kafka.ingestion.startDelay" = "PT1S",
@@ -228,7 +228,7 @@ TBLPROPERTIES (
 Start Druid indexing
 
 ```SQL
-ALTER TABLE workshop.sentiment_analysis SET TBLPROPERTIES('druid.kafka.ingestion' = 'START');
+ALTER TABLE workshop.meetup_comment_sentiment SET TBLPROPERTIES('druid.kafka.ingestion' = 'START');
 ```
 
 Verify that supervisor and indexing task are running from the [Druid overload console](http://demo.hortonworks.com:8090/console.html)
@@ -257,7 +257,7 @@ Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the step
   - Add InvokeHTTP processor and link from ReplaceText on **success** relationship
   - Double click on processor and check all relationships except response on settings tab
   - Go to properties tab and set value for **HTTP Method** to **POST**
-  - Set **Remote URL** with value: **http://demo.hortonworks.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D** which is the url encoded value for **http://demo.hortonworks.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}**
+  - Set **Remote URL** with value: ```http://demo.hortonworks.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for ```http://demo.hortonworks.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}```
   - Set **Replacement Strategy** to **Always Replace**
   - Apply changes
   
@@ -287,7 +287,7 @@ Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the step
   - On settings tab, check all relationships
   - On properties tab
   - Change **Kafka Brokers** value to **demo.hortonworks.com:6667**
-  - Change **Topic Name** value to **druid_demo**
+  - Change **Topic Name** value to **meetup_comment_ws**
   - Change **Use Transactions** value to **false**
   - Apply changes
   
