@@ -15,7 +15,7 @@
 * [Lab 2 - Stream data using NiFi](#stream-data-using-nifi)
 * [Lab 3 - Explore Kafka](#explore-kafka)
 * [Lab 4 - Explore Hive, Druid and Zeppelin](#explore-hive-druid-and-zeppelin)
-* [Lab 5 - Stream data into Hive using NiFi](#stream-data-into-hive-using-nifi)
+* [Lab 5 - Stream enhanced data into Hive using NiFi](#stream-enhanced-data-into-hive-using-nifi)
 * [Lab 6 - Create live dashboard with Superset](#create-live-dashboard-with-superset)
 
 ## Accessing the sandbox
