@@ -321,11 +321,13 @@ Edit the **meetup_comment_sentiment** datasource record and verify that the colu
 
 ![Druid datasource columns](images/druid_datasource_columns.png)
 
-Click on the datasource and create the following dashboard
+Click on the datasource and create the following query
 
-![Druid datasource columns](images/druid_dashboard.png)
+![Druid query](images/druid_query.png)
 
-Play with other visualization types
+From this query, create a dashboard that will refresh automatically
+
+![Druid dashboard](images/druid_dashboard.png)
 
 
 
