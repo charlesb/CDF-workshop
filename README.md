@@ -130,7 +130,7 @@ Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and 
   - Change **Destination** value to **flowfile-attribute**
   - Add properties as follow
     - comment: $.comment
-    - member: $.member
+    - member: $.member.member_name
     - timestamp: $.mtime
     
     ![EvaluateJsonPath 1 properties](images/evaluatejsonpathproperties1.png)
@@ -141,30 +141,27 @@ Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and 
     {"visibility":"public","member":{"member_id":11643711,"photo":"https:\/\/secure.meetupstatic.com\/photos\/member\/3\/1\/6\/8\/thumb_273072648.jpeg","member_name":"Loka Murphy"},"comment":"I didn’t when I registered but now thinking I want to try and get one since it’s only taking place once.","id":-259414201,"mtime":1541557753087,"event":{"event_name":"Tunnel to Viaduct 8k Run","event_id":"256109695"},"table_name":"event_comment","group":{"join_mode":"open","country":"us","city":"Seattle","name":"Seattle Green Lake Running Group","group_lon":-122.34,"id":1608555,"state":"WA","urlname":"Seattle-Greenlake-Running-Group","category":{"name":"fitness","id":9,"shortname":"fitness"},"group_photo":{"highres_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/highres_465640692.jpeg","photo_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/600_465640692.jpeg","photo_id":465640692,"thumb_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/thumb_465640692.jpeg"},"group_lat":47.61},"in_reply_to":496130460,"status":"active"}
     ```
 
-- Step 4: Add a AttributeToJSON connector to the canvas and link from EvaluateJsonPath on **matched** relationship
+- Step 4: Add a AttributeToCSV connector to the canvas and link from EvaluateJsonPath on **matched** relationship
   - Double click on the processor
   - On settings tab, check **failure** relationship
   - Change **Destination** value to **flowfile-content**
-  - Change **Attribute List** value to **network,time,sentiment,text,url**
+  - Change **Attribute List** value to write only the above parsed attributes: **timestamp, member, comment**
   - Apply changes
   
-- Step 5: Add a MergeContent connector to the canvas and link from AttributeToJSON on **success** relationship
-  - Double click on the processor
-  - On settings tab, check both **failure** and **original** relationships
-  - Apply changes
-  
-- Step 6: Add a PutFile connector to the canvas and link from MergeContent on **merge** relationship
+- Step 5: Add a PutFile connector to the canvas and link from AttributeToJSON on **success** relationship
   - Double click on the processor
   - On settings tab, check all relationships
-  - Change **Directory** value to **/tmp/socialmedia**
+  - Change **Directory** value to **/tmp/workshop**
   - Change **Conflict Resolution Strategy** value to **replace**
   - Apply changes
   
-- Step 7: Start the entire flow
+- Step 6: Start the entire flow
 
 ![NiFi Flow 1](images/flow1.png)
 
-Explore the file created under /tmp/socialmedia
+Explore the files created under /tmp/workshop
+
+**Once done, stop the flow and delete all files ```sudo rm -rf /tmp/workshop/*```**
 
 ## Explore Kafka
 
