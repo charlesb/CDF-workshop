@@ -69,16 +69,16 @@ On Windows use [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest
 
 ## Stream data using NiFi
 
-Open [NiFi](http://demo.hortonworks.com:9090/nifi/) UI
-
 ### Run the sentiment analysis model as a REST-like service
 
 For the purpose of this exercise we are not going to train, test and implement a classification model but re-use an existing sentiment analysis model, provided by the Stanford University as part of their [CoreNLP - Natural language software](https://stanfordnlp.github.io/CoreNLP/)
 
-In order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html) run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), which has already been downloaded into the sandbox, with the following command:
+In order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html), after ssh'ing to the sandbox, run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), which has already been downloaded into the sandbox, with the following command:
 
-```cd /home/centos/stanford-corenlp-full-2018-10-05```
-```java -mx1g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9999 -timeout 15000 </dev/null &>/dev/null &```
+```bash
+cd /home/centos/stanford-corenlp-full-2018-10-05
+java -mx1g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9999 -timeout 15000 </dev/null &>/dev/null &
+```
 
 This will run in the background on port 9999 and you can visit the [web page](http://demo.hortonworks.com:9999/) to make sure it's running.
 
@@ -95,6 +95,8 @@ The model will classify the given text into 5 categories:
 - very positive
 
 ### Build NiFi flow
+
+Open [NiFi](http://demo.hortonworks.com:9090/nifi/) UI
 
 - Step 1: Add a InvokeHTTP processor to the canvas
   - Double click on the processor
