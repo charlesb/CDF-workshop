@@ -1,8 +1,8 @@
-# HDP & HDF Labs: Real-time social media sentiment analysis with NiFi, Kafka, Druid, Zeppelin and Superset
+# HDP & HDF Labs: Real-time sentiment analysis with NiFi, Kafka, Druid, Zeppelin and Superset
 
 ## Prerequisite
 
-- Launch AWS AMI **ami-03302dad17fa68071** with **m5d.4xlarge** instance type
+- Launch AWS AMI **ami-075c32187766b5bff** with **m5d.4xlarge** instance type
 - Keep default storage (300GB SSD)
 - Set security group with:
   - Type: All TCP
@@ -71,15 +71,28 @@ On Windows use [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest
 
 Open [NiFi](http://demo.hortonworks.com:9090/nifi/) UI
 
-### Get social media sentiment analysis: let's see what people think about Hortonworks :)
+### Run the sentiment analysis model as a REST-like service
 
-For the purpose of this exercise we are going to use the [Social Searcher](https://www.social-searcher.com/) monitoring tool.
+For the purpose of this exercise we are not going to train, test and implement a classification model but re-use an existing sentiment analysis model, provided by the Stanford University as part of their [CoreNLP - Natural language software](https://stanfordnlp.github.io/CoreNLP/)
 
-The API documentation can be found [here](https://www.social-searcher.com/api-v2/)
+In order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html) run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), which has already been downloaded into the sandbox, with the following command:
 
-To get started we need to get the data from the Social Media REST API, extract what we need and save it to a file
+```cd /home/centos/stanford-corenlp-full-2018-10-05```
+```java -mx1g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9999 -timeout 15000 </dev/null &>/dev/null &```
 
-We want to have a feeling of the sentiment when people are posting about Hortonworks on Facebook and Twitter
+This will run in the background on port 9999 and you can visit the [web page](http://demo.hortonworks.com:9999/) to make sure it's running.
+
+If you want to play with it, remove all annotations and use **Sentiment** only
+
+![Image of CoreNLP web service](images/corenlp_web.png)
+
+The model will classify the given text into 5 categories:
+
+- very negative
+- negative
+- neutral
+- positive
+- very positive
 
 ### Build NiFi flow
 
@@ -224,7 +237,7 @@ First we are going to stop and disable some processors from the previous Flow
   - Replace ```network,time,sentiment,text,url``` in the Attributes List with ```network,__time,sentiment```
   - Apply changes
   
-- Step 4: Add a **PublishKafkaRecord_1_0** connector to the canvas and link from AttributesToJSON on **success** relationship
+- Step 4: Add a **PublishKafka_1_0** connector to the canvas and link from AttributesToJSON on **success** relationship
   - Double click on the processor
   - On settings tab, check all relationships
   - On properties tab
