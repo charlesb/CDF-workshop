@@ -96,7 +96,13 @@ The model will classify the given text into 5 categories:
 
 ### Build NiFi flow
 
-Open [NiFi](http://demo.hortonworks.com:9090/nifi/) UI
+In order to have a streaming source available we are going to make use of the publicly available Meetup's API and connect directly to their WebSocket.
+
+The API documentation is available [here](https://www.meetup.com/meetup_api/docs/stream/2/event_comments/#websockets): https://www.meetup.com/meetup_api/docs/stream/2/event_comments/#websockets
+
+In this scenario we are going to stream all comments into NiFi and find out scoring the comment against the Stanford CoreNLP's sentiment model. In real-world use case we would probably filter by event of our interest but for the sake of this workshop we don't filter by event.
+
+Let's get started... Open [NiFi](http://demo.hortonworks.com:9090/nifi/) UI and follow the steps below:
 
 - Step 1: Add a InvokeHTTP processor to the canvas
   - Double click on the processor
