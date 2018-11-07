@@ -102,7 +102,7 @@ The API documentation is available [here](https://www.meetup.com/meetup_api/docs
 
 In this scenario we are going to stream all comments into NiFi and find out scoring the comment against the Stanford CoreNLP's sentiment model. In real-world use case we would probably filter by event of our interest but for the sake of this workshop we don't filter by event.
 
-Let's get started... Open [NiFi](http://demo.hortonworks.com:9090/nifi/) UI and follow the steps below:
+Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the steps below:
 
 - Step 1: Add a InvokeHTTP processor to the canvas
   - Double click on the processor
