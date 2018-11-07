@@ -209,7 +209,8 @@ Create the Hive table backed by Druid storage where the social medias sentiment 
 ```SQL
 CREATE EXTERNAL TABLE workshop.sentiment_analysis (
 `__time` timestamp,
-`network` string,
+`member` string,
+`comment` string,
 `sentiment` string
 )
 STORED BY 'org.apache.hadoop.hive.druid.DruidStorageHandler'
@@ -234,25 +235,54 @@ Verify that supervisor and indexing task are running from the [Druid overload co
 
 ![Image of zeppelin create table](images/zeppelin_create_table.png)
 
-## Stream data into Hive using NiFi
+## Stream enhanced data into Hive using NiFi
 
-First we are going to stop and disable some processors from the previous Flow
+Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the steps below:
 
-- Step 1: Disable unnecessary processors
-  - Right click and disable MergeContent and PutFile processors
+- Step 1: Remove no longer needed processor from previous flow
+  - Right click on the relationship between EvaluateJsonPath and AttibutesToCSV processors and delete
+  - Do the same for the EvaluateJsonPath processor
+  - Right click on the relationship between AttibutesToCSV and PutFile processors and delete
+  - Do the same for the PutFile processor
   
-- Step 2: Format post time to comply with [ISO format](https://en.wikipedia.org/wiki/ISO_8601) (Druid requirement)
-  - Add UpdateAttribute processor between EvaluateJSonPath and AttributesToJSON processors
-  - Using handy [NiFi's language expression](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html#dates), add a new attribue ```__time``` with value: ```${time:toDate("yyyy-MM-dd HH:mm:ss '+00000'", "GMT"):format("yyyy-MM-dd'T'HH:mm:ss'Z'", "Asia/Singapore")}```
-
-- Step 3: Modify existing AttributesToJSON processor to stream new attribute ```__time```
-  - Double click on processor
-  - On settings tab, check **failure** relationship
-  -  Go to properties tab
-  - Replace ```network,time,sentiment,text,url``` in the Attributes List with ```network,__time,sentiment```
+- Step 2: Prepare the content to be posted to the sentiment analysis service
+  - Add ReplaceText processor and link from EvaluateJSonPath on **matched** relationship
+  - Double click on processor and check failure on settings tab
+  - Go to properties tab and remove value for **Search Value** and set it to empty string
+  - Set **Replacement Value** with value: **${comment:replaceAll('\.', ';')}**. We want to make sure the entire comment is evaluated as one sentence instead of one evaluation per sentence within the same comment.
+  - Set **Content-Type** to **application/x-www-form-urlencoded**
   - Apply changes
   
-- Step 4: Add a **PublishKafka_1_0** connector to the canvas and link from AttributesToJSON on **success** relationship
+- Step 3: Call the web service started earlier on incoming message
+  - Add InvokeHTTP processor and link from ReplaceText on **success** relationship
+  - Double click on processor and check all relationships except response on settings tab
+  - Go to properties tab and set value for **HTTP Method** to **POST**
+  - Set **Remote URL** with value: **http://demo.hortonworks.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D** which is the url encoded value for **http://demo.hortonworks.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}**
+  - Set **Replacement Strategy** to **Always Replace**
+  - Apply changes
+  
+- Step 4: Add EvaluateJsonPath to the canvas and link from InvokeHTTP on **response** relationship
+  - Double click on the processor
+  - On settings tab, check both **failure** and **unmatched** relationships
+  - On properties tab
+  - Change **Destination** value to **flowfile-attribute**
+  - Add on the property **sentiment** with value **$.sentences[0].sentiment**
+  - Apply changes
+  
+- Step 5: Format post time to comply with [ISO format](https://en.wikipedia.org/wiki/ISO_8601) (Druid requirement)
+  - Add UpdateAttribute processor and link from EvaluateJsonPath on **matched** relationship
+  - Using handy [NiFi's language expression](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html#dates), add a new attribue ```__time``` with value: ```${timestamp:format("yyyy-MM-dd'T'HH:mm:ss'Z'", "Asia/Singapore")}``` to settings tab
+
+- Step 6: Add AttributesToJSON processor to prepare the message to be published to the Kafka topic created before. Link from UpdateAttribute.
+  - Double click on processor
+  - On settings tab, check **failure** relationship
+  - Go to properties tab
+  - In the Attributes List value set ```__time, comment, member, sentiment``` to match the previously created Hive table
+  - Change Destination to **flowfile-content**
+  - Set Include Core Attributes to **false**
+  - Apply changes
+  
+- Step 7: Last step, add a **PublishKafka_1_0** connector to the canvas and link from AttributesToJSON on **success** relationship
   - Double click on the processor
   - On settings tab, check all relationships
   - On properties tab
@@ -261,7 +291,7 @@ First we are going to stop and disable some processors from the previous Flow
   - Change **Use Transactions** value to **false**
   - Apply changes
   
-- Step 5: Start the entire flow
+You can now start the entire flow
 	
 The overall flow should look like this
 
