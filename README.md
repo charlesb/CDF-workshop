@@ -249,6 +249,8 @@ ALTER TABLE workshop.meetup_comment_sentiment SET TBLPROPERTIES('druid.kafka.ing
 
 Verify that supervisor and indexing task are running from the [Druid overload console](http://demo.hortonworks.com:8090/console.html)
 
+![Druid console](images/druid_console.png)
+
 ## Stream enhanced data into Hive using NiFi
 
 Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the steps below:
