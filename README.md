@@ -96,11 +96,15 @@ The model will classify the given text into 5 categories:
 
 ### Build NiFi flow
 
-In order to have a streaming source available we are going to make use of the publicly available Meetup's API and connect directly to their WebSocket.
+In order to have a streaming source available for our workshop, we are going to make use of the publicly available Meetup's API and connect to their WebSocket.
 
 The API documentation is available [here](https://www.meetup.com/meetup_api/docs/stream/2/event_comments/#websockets): https://www.meetup.com/meetup_api/docs/stream/2/event_comments/#websockets
 
-In this scenario we are going to stream all comments into NiFi and find out scoring the comment against the Stanford CoreNLP's sentiment model. In real-world use case we would probably filter by event of our interest but for the sake of this workshop we don't filter by event.
+In this scenario we are going to stream all comments, for all topics, into NiFi and classify each one of them into the 5 categories listed above. 
+
+To do that we need to score each comment's content against the Stanford CoreNLP's sentiment model. 
+
+In real-world use case we would probably filter by event of our interest but for the sake of this workshop we won't and assume all comments are given for the same event: the famous HDF workshop!
 
 Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the steps below:
 
@@ -108,18 +112,17 @@ Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and 
   - Double click on the processor
   - On settings tab, check all relationships except **text message**
   - Got to properties tab and select or create **JettyWebSocketClient** as the WebSocket Client ControllerService
-  - The configure the service clicking on the arrow on the right
-  - If the service is already enable, disable it first click on the thunder icon, then configure it
-  	- Add this value: ```ws://stream.meetup.com/2/event_comments``` to property **WebSocket URI**
+  - Then configure the service (click on the arrow on the right)	
+  	- Go to properties tab and add this value: ```ws://stream.meetup.com/2/event_comments``` to property **WebSocket URI**
   	- Apply the change
-  	- Enable the controller service and close the window
+  	- Enable the controller service (click on the thunder icon) and close the window
   - Go to properties tab and give a value to **WebSocket Client Id** such as **demo** for example
   - Apply changes
   
-- Step 2: Add a UpdateAttribute connector to the canvas and link from ConnectWebSocket on **text message** relationship
+- Step 2: Add an UpdateAttribute connector to the canvas and link from ConnectWebSocket on **text message** relationship
   - Double click on the processor
-  - On properties tab add new property **mime.type** clicking on + icon and give the value **application/json**. This will tell the rest of of the flow that the messages sent by the Meetup WebSocket is in JSON format.
-  - Add another property **event** to set an event name **HDF workshop** for the purpose of this exercise
+  - On properties tab add new property **mime.type** clicking on + icon and give the value **application/json**. This will tell the next processor that the messages sent by the Meetup WebSocket is in JSON format.
+  - Add another property **event** to set an event name **HDF workshop** for the purpose of this exercise as explained before
   - Apply changes
   
   ![UpdateAtrribute 1 properties](images/updateattibute1properties.png)
@@ -127,9 +130,8 @@ Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and 
 - Step 3: Add EvaluateJsonPath to the canvas and link from UpdateAttribute on **success** relationship
   - Double click on the processor
   - On settings tab, check both **failure** and **unmatched** relationships
-  - On properties tab
-  - Change **Destination** value to **flowfile-attribute**
-  - Add properties as follow
+  - On properties tab, change **Destination** value to **flowfile-attribute**
+  - And add properties as follow
     - comment: $.comment
     - member: $.member.member_name
     - timestamp: $.mtime
@@ -142,18 +144,17 @@ Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and 
     {"visibility":"public","member":{"member_id":11643711,"photo":"https:\/\/secure.meetupstatic.com\/photos\/member\/3\/1\/6\/8\/thumb_273072648.jpeg","member_name":"Loka Murphy"},"comment":"I didn’t when I registered but now thinking I want to try and get one since it’s only taking place once.","id":-259414201,"mtime":1541557753087,"event":{"event_name":"Tunnel to Viaduct 8k Run","event_id":"256109695"},"table_name":"event_comment","group":{"join_mode":"open","country":"us","city":"Seattle","name":"Seattle Green Lake Running Group","group_lon":-122.34,"id":1608555,"state":"WA","urlname":"Seattle-Greenlake-Running-Group","category":{"name":"fitness","id":9,"shortname":"fitness"},"group_photo":{"highres_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/highres_465640692.jpeg","photo_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/600_465640692.jpeg","photo_id":465640692,"thumb_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/thumb_465640692.jpeg"},"group_lat":47.61},"in_reply_to":496130460,"status":"active"}
     ```
 
-- Step 4: Add a AttributeToCSV connector to the canvas and link from EvaluateJsonPath on **matched** relationship
+- Step 4: Add an AttributesToCSV connector to the canvas and link from EvaluateJsonPath on **matched** relationship
   - Double click on the processor
   - On settings tab, check **failure** relationship
   - Change **Destination** value to **flowfile-content**
-  - Change **Attribute List** value to write only the above parsed attributes: **timestamp, member, comment**
+  - Change **Attribute List** value to write only the above parsed attributes: **timestamp, event, member, comment**
   - Apply changes
   
-- Step 5: Add a PutFile connector to the canvas and link from AttributeToJSON on **success** relationship
+- Step 5: Add a PutFile connector to the canvas and link from AttributesToCSV on **success** relationship
   - Double click on the processor
   - On settings tab, check all relationships
   - Change **Directory** value to **/tmp/workshop**
-  - Change **Conflict Resolution Strategy** value to **replace**
   - Apply changes
   
 - Step 6: Start the entire flow
@@ -161,6 +162,8 @@ Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and 
 ![NiFi Flow 1](images/flow1.png)
 
 Explore the files created under /tmp/workshop
+
+Explore the FlowFiles' attributes and content looking at Data provenance.
 
 **Once done, stop the flow and delete all files ```sudo rm -rf /tmp/workshop/*```**
 
