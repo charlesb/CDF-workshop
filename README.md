@@ -197,14 +197,15 @@ Follow the same steps as above except for the last step where we are going to op
 
 ```./bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic meetup_comment_ws```
 
-Type anything and click enter. Then go back to the first terminal with the consumer running. You should see the same message displau
+Type anything and click enter. Then go back to the first terminal with the consumer running. You should see the same message get displayed!
 
 ## Explore Hive, Druid and Zeppelin
 
-Visit [Zeppelin](http://demo.hortonworks.com:9995/)
-And log in as admin (password: admin)
+Visit [Zeppelin](http://demo.hortonworks.com:9995/) and log in as admin (password: admin)
 
-Create a new notebook called Demo (use jdbc as default interpreter)
+Create a new note(book) called Demo (use jdbc as default interpreter)
+
+![Zeppelin note creation](images/zeppelin_create_note.png)
 
 Add the interpreter to connect to Hive LLAP
 
