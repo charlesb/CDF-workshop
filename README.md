@@ -161,9 +161,9 @@ Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and 
 
 ![NiFi Flow 1](images/flow1.png)
 
-Explore the files created under /tmp/workshop
+SSH to the sandbox and explore the files created under /tmp/workshop.
 
-Explore the FlowFiles' attributes and content looking at Data provenance.
+On the NiFi UI, explore the FlowFiles' attributes and content looking at Data provenance.
 
 **Once done, stop the flow and delete all files ```sudo rm -rf /tmp/workshop/*```**
 
@@ -177,7 +177,7 @@ Navigate to Kafka
 
 ```cd /usr/hdp/current/kafka-broker```
 
-Create a topic named druid_demo
+Create a topic named **meetup_comment_ws**
 
 ```./bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic meetup_comment_ws```
 
@@ -185,11 +185,19 @@ List topics to check that it's been created
 
 ```./bin/kafka-topics.sh --list --zookeeper demo.hortonworks.com:2181```
 
-Open a consumer so later we can monitor and verify that JSON records will stream through this topic
+Open a consumer so later we can monitor and verify that JSON records will stream through this topic:
 
 ```./bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_comment_ws```
 
-Keep the terminal open
+Keep this terminal open.
+
+We will now open a new terminal to publish some messages...
+
+Follow the same steps as above except for the last step where we are going to open a producer instead of a consumer:
+
+```./bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic meetup_comment_ws```
+
+Type anything and click enter. Then go back to the first terminal with the consumer running. You should see the same message displau
 
 ## Explore Hive, Druid and Zeppelin
 
