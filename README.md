@@ -239,6 +239,8 @@ TBLPROPERTIES (
 );
 ```
 
+![Zeppelin create DB and table](images/zeppelin_create_db_and_table.png)
+
 Start Druid indexing
 
 ```SQL
