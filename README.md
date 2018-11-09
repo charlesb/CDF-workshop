@@ -2,7 +2,7 @@
 
 ## Prerequisite
 
-- Launch AWS AMI **ami-075c32187766b5bff** with **m5d.4xlarge** instance type
+- Launch AWS AMI **ami-07834aacc518598b7** with **m5d.4xlarge** instance type
 - Keep default storage (300GB SSD)
 - Set security group with:
   - Type: All TCP
@@ -257,27 +257,26 @@ Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the step
 
 - Step 1: Remove no longer needed processor from previous flow
   - Right click on the relationship between EvaluateJsonPath and AttibutesToCSV processors and delete
-  - Do the same for the EvaluateJsonPath processor
-  - Right click on the relationship between AttibutesToCSV and PutFile processors and delete
+  - Delete the AttibutesToCSV processor
   - Do the same for the PutFile processor
   
 - Step 2: Prepare the content to be posted to the sentiment analysis service
   - Add ReplaceText processor and link from EvaluateJSonPath on **matched** relationship
-  - Double click on processor and check failure on settings tab
+  - Double click on processor and check **failure** on settings tab
   - Go to properties tab and remove value for **Search Value** and set it to empty string
   - Set **Replacement Value** with value: **${comment:replaceAll('\.', ';')}**. We want to make sure the entire comment is evaluated as one sentence instead of one evaluation per sentence within the same comment.
-  - Set **Content-Type** to **application/x-www-form-urlencoded**
+  - Set **Replacement Strategy** to **Always Replace**
   - Apply changes
   
 - Step 3: Call the web service started earlier on incoming message
   - Add InvokeHTTP processor and link from ReplaceText on **success** relationship
-  - Double click on processor and check all relationships except response on settings tab
+  - Double click on processor and check all relationships except **Response** on settings tab
   - Go to properties tab and set value for **HTTP Method** to **POST**
   - Set **Remote URL** with value: ```http://demo.hortonworks.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for ```http://demo.hortonworks.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}```
-  - Set **Replacement Strategy** to **Always Replace**
+  - Set **Content-Type** to **application/x-www-form-urlencoded**
   - Apply changes
   
-- Step 4: Add EvaluateJsonPath to the canvas and link from InvokeHTTP on **response** relationship
+- Step 4: Add EvaluateJsonPath to the canvas and link from InvokeHTTP on **Response** relationship
   - Double click on the processor
   - On settings tab, check both **failure** and **unmatched** relationships
   - On properties tab
