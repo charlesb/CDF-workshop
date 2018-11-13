@@ -1,5 +1,6 @@
 # HDP & HDF Labs: Real-time sentiment analysis with NiFi, Kafka, Druid, Zeppelin and Superset
 
+
 ## Prerequisite
 
 - Launch AWS AMI **ami-07834aacc518598b7** with **m5d.4xlarge** instance type
