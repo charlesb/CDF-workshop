@@ -265,7 +265,7 @@ Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the step
   - Add ReplaceText processor and link from EvaluateJSonPath on **matched** relationship
   - Double click on processor and check **failure** on settings tab
   - Go to properties tab and remove value for **Search Value** and set it to empty string
-  - Set **Replacement Value** with value: **${comment:replaceAll('\.', ';')}**. We want to make sure the entire comment is evaluated as one sentence instead of one evaluation per sentence within the same comment.
+  - Set **Replacement Value** with value: **${comment:replaceAll('\\.', ';')}**. We want to make sure the entire comment is evaluated as one sentence instead of one evaluation per sentence within the same comment.
   - Set **Replacement Strategy** to **Always Replace**
   - Apply changes
   
