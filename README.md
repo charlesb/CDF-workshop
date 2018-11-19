@@ -3,7 +3,7 @@
 
 ## Prerequisite
 
-- Launch AWS AMI **ami-07834aacc518598b7** with **m5d.4xlarge** instance type
+- Launch AWS AMI **ami-08e490589c0b064c8** with **m5d.4xlarge** instance type
 - Keep default storage (300GB SSD)
 - Set security group with:
   - Type: All TCP
@@ -307,7 +307,7 @@ Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the step
   - Change **Use Transactions** value to **false**
   - Apply changes
   
-You can now start the entire flow
+Before starting the NiFi flow make sure that the [sentiment analysis Web service](https://github.com/charlesb/HDP-HDF-workshop#run-the-sentiment-analysis-model-as-a-rest-like-service) is running
 	
 The overall flow should look like this
 
