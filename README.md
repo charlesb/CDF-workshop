@@ -3,7 +3,7 @@
 
 ## Prerequisite
 
-- Launch AWS AMI **ami-08e490589c0b064c8** with **m5d.4xlarge** instance type
+- Launch AWS AMI **ami-0754aef50075ce8ac** with **m5d.4xlarge** instance type
 - Keep default storage (300GB SSD)
 - Set security group with:
   - Type: All TCP
@@ -29,7 +29,7 @@ On Windows, open C:\Windows\System32\drivers\etc\hosts
 
 Add a new line to the existing
 
-```nn.nnn.nnn.nnn	demo.hortonworks.com```
+```nn.nnn.nnn.nnn	demo.cloudera.com```
 
 Replacing the ip (nn.nnn.nnn.nnn) address with the one provided
 
@@ -37,7 +37,7 @@ Replacing the ip (nn.nnn.nnn.nnn) address with the one provided
 
 Open a web browser and go to the following url
 
-```http://demo.hortonworks.com:8080/```
+```http://demo.cloudera.com:8080/```
 
 Log in with the following credential
 
@@ -81,7 +81,7 @@ cd /home/centos/stanford-corenlp-full-2018-10-05
 java -mx1g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9999 -timeout 15000 </dev/null &>/dev/null &
 ```
 
-This will run in the background on port 9999 and you can visit the [web page](http://demo.hortonworks.com:9999/) to make sure it's running.
+This will run in the background on port 9999 and you can visit the [web page](http://demo.cloudera.com:9999/) to make sure it's running.
 
 If you want to play with it, remove all annotations and use **Sentiment** only
 
@@ -107,7 +107,7 @@ To do that we need to score each comment's content against the Stanford CoreNLP'
 
 In real-world use case we would probably filter by event of our interest but for the sake of this workshop we won't and assume all comments are given for the same event: the famous HDF workshop!
 
-Let's get started... Open [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the steps below:
+Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps below:
 
 - Step 1: Add a ConnectWebSocket processor to the canvas
   - Double click on the processor
@@ -180,15 +180,15 @@ Navigate to Kafka
 
 Create a topic named **meetup_comment_ws**
 
-```./bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic meetup_comment_ws```
+```./bin/kafka-topics.sh --create --zookeeper demo.cloudera.com:2181 --replication-factor 1 --partitions 1 --topic meetup_comment_ws```
 
 List topics to check that it's been created
 
-```./bin/kafka-topics.sh --list --zookeeper demo.hortonworks.com:2181```
+```./bin/kafka-topics.sh --list --zookeeper demo.cloudera.com:2181```
 
 Open a consumer so later we can monitor and verify that JSON records will stream through this topic:
 
-```./bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_comment_ws```
+```./bin/kafka-console-consumer.sh --bootstrap-server demo.cloudera.com:6667 --topic meetup_comment_ws```
 
 Keep this terminal open.
 
@@ -196,13 +196,13 @@ We will now open a new terminal to publish some messages...
 
 Follow the same steps as above except for the last step where we are going to open a producer instead of a consumer:
 
-```./bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic meetup_comment_ws```
+```./bin/kafka-console-producer.sh --broker-list demo.cloudera.com:6667 --topic meetup_comment_ws```
 
 Type anything and click enter. Then go back to the first terminal with the consumer running. You should see the same message get displayed!
 
 ## Explore Hive, Druid and Zeppelin
 
-Visit [Zeppelin](http://demo.hortonworks.com:9995/) and log in as admin (password: admin)
+Visit [Zeppelin](http://demo.cloudera.com:9995/) and log in as admin (password: admin)
 
 Create a new note(book) called Demo (use jdbc as default interpreter)
 
@@ -230,7 +230,7 @@ CREATE EXTERNAL TABLE workshop.meetup_comment_sentiment (
 )
 STORED BY 'org.apache.hadoop.hive.druid.DruidStorageHandler'
 TBLPROPERTIES (
-"kafka.bootstrap.servers" = "demo.hortonworks.com:6667",
+"kafka.bootstrap.servers" = "demo.cloudera.com:6667",
 "kafka.topic" = "meetup_comment_ws",
 "druid.kafka.ingestion.useEarliestOffset" = "true",
 "druid.kafka.ingestion.maxRowsInMemory" = "5",
@@ -248,13 +248,13 @@ Start Druid indexing
 ALTER TABLE workshop.meetup_comment_sentiment SET TBLPROPERTIES('druid.kafka.ingestion' = 'START');
 ```
 
-Verify that supervisor and indexing task are running from the [Druid overload console](http://demo.hortonworks.com:8090/console.html)
+Verify that supervisor and indexing task are running from the [Druid overload console](http://demo.cloudera.com:8090/console.html)
 
 ![Druid console](images/druid_console.png)
 
 ## Stream enhanced data into Hive using NiFi
 
-Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the steps below:
+Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps below:
 
 - Step 1: Remove no longer needed processor from previous flow
   - Right click on the relationship between EvaluateJsonPath and AttibutesToCSV processors and delete
@@ -273,7 +273,7 @@ Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the step
   - Add InvokeHTTP processor and link from ReplaceText on **success** relationship
   - Double click on processor and check all relationships except **Response** on settings tab
   - Go to properties tab and set value for **HTTP Method** to **POST**
-  - Set **Remote URL** with value: ```http://demo.hortonworks.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for ```http://demo.hortonworks.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}```
+  - Set **Remote URL** with value: ```http://demo.cloudera.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for ```http://demo.cloudera.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}```
   - Set **Content-Type** to **application/x-www-form-urlencoded**
   - Apply changes
   
@@ -302,7 +302,7 @@ Go back to [NiFi UI](http://demo.hortonworks.com:9090/nifi/) and follow the step
   - Double click on the processor
   - On settings tab, check all relationships
   - On properties tab
-  - Change **Kafka Brokers** value to **demo.hortonworks.com:6667**
+  - Change **Kafka Brokers** value to **demo.cloudera.com:6667**
   - Change **Topic Name** value to **meetup_comment_ws**
   - Change **Use Transactions** value to **false**
   - Apply changes
@@ -323,7 +323,7 @@ Going back to Zeppelin, we can query the data streamed in real-time
 
 ## Create live dashboard with Superset
 
-Go to [Superset UI](http://demo.hortonworks.com:9088/)
+Go to [Superset UI](http://demo.cloudera.com:9088/)
 
 Log in with user **admin** and password **superset**
 
