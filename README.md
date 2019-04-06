@@ -365,6 +365,15 @@ You should see heartbeats coming from the agent
 
 ![EFM agents monitor](images/efm-agents-monitor.png)
 
+Now create a simple flow to collect local syslog messages and forward them to NiFi
+
+Since our agent is tagged with the class 'demo', we are going to create a template under this specific class
+
+But first we need to add an Input Port to the root canvas of NiFi as and do something interesting with the logs
+
+![NiFi syslog parser](images/nifi-syslog-parser.png)
+
+
 
 
 
