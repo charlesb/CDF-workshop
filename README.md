@@ -18,6 +18,7 @@
 * [Lab 4 - Explore Hive, Druid and Zeppelin](#explore-hive-druid-and-zeppelin)
 * [Lab 5 - Stream enhanced data into Hive using NiFi](#stream-enhanced-data-into-hive-using-nifi)
 * [Lab 6 - Create live dashboard with Superset](#create-live-dashboard-with-superset)
+* [Lab 7 - Collect syslog data using MiNiFi and EFM](#collect-syslog-data-using-minifi-and-efm)
 
 ## Accessing the sandbox
 
@@ -79,7 +80,6 @@ First, after ssh'ing to the sandbox, download and unzip the CoreNLP using the wg
 ```bash
 wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
 unzip stanford-corenlp-full-2018-10-05.zip
-cd 
 ```
 
 Then, in order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html), run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), with the following commands:
@@ -306,7 +306,7 @@ Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps b
   - Set Include Core Attributes to **false**
   - Apply changes
   
-- Step 7: Last step, add a **PublishKafka_1_0** connector to the canvas and link from AttributesToJSON on **success** relationship
+- Step 7: Last step, add a **PublishKafka_2_0** connector to the canvas and link from AttributesToJSON on **success** relationship
   - Double click on the processor
   - On settings tab, check all relationships
   - On properties tab
@@ -333,7 +333,7 @@ Going back to Zeppelin, we can query the data streamed in real-time
 
 Go to [Superset UI](http://demo.cloudera.com:9088/)
 
-Log in with user **admin** and password **superset**
+Log in with user **admin** and password **admin**
 
 Refresh Druid metadata
 
@@ -350,6 +350,8 @@ Click on the datasource and create the following query
 From this query, create a dashboard that will refresh automatically
 
 ![Druid dashboard](images/druid_dashboard.png)
+
+## Collect syslog data using MiNiFi and EFM
 
 
 
