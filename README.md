@@ -353,6 +353,17 @@ From this query, create a dashboard that will refresh automatically
 
 ## Collect syslog data using MiNiFi and EFM
 
+As root (sudo su -) start EFM and MiNiFi
+
+```bash
+service efm start
+service minifi start
+```
+Visit [EFM UI](http://demo.cloudera.com:10080/efm/ui/)
+
+You should see heartbeats coming from the agent
+
+![EFM agents monitor](images/efm-agents-monitor.png)
 
 
 
