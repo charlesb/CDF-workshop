@@ -74,10 +74,18 @@ On Windows use [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest
 
 For the purpose of this exercise we are not going to train, test and implement a classification model but re-use an existing sentiment analysis model, provided by the Stanford University as part of their [CoreNLP - Natural language software](https://stanfordnlp.github.io/CoreNLP/)
 
-In order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html), after ssh'ing to the sandbox, run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), which has already been downloaded into the sandbox, with the following command:
+First, after ssh'ing to the sandbox, download and unzip the CoreNLP using the wget as below:
 
 ```bash
-cd /home/centos/stanford-corenlp-full-2018-10-05
+wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
+unzip stanford-corenlp-full-2018-10-05.zip
+cd 
+```
+
+Then, in order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html), run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), with the following commands:
+
+```bash
+cd /path/to/stanford-corenlp-full-2018-10-05
 java -mx1g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9999 -timeout 15000 </dev/null &>/dev/null &
 ```
 
