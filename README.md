@@ -371,17 +371,17 @@ Now create a simple flow to collect local syslog messages and forward them to Ni
 
 Our agent has been tagged with the class 'demo' (check nifi.c2.agent.class property in /usr/minifi/conf/bootstrap.conf) so we are going to create a template under this specific class
 
-But first we need to add an Input Port to the root canvas of NiFi and build a flow as described before
+But first we need to add an Input Port to the root canvas of NiFi and build a flow as described before. Input Port are used to receive flow files from remote MiNiFi agents or other NiFi instances.
 
 ![NiFi syslog parser](images/nifi-syslog-parser.png)
 
 Don't forget to create a new Kafka topic as explained in Lab 3 above.
 
-We are going to use a Grok parser to parse the syslog messages. Here is a Grok expression that can be used here:
+We are going to use a Grok parser to parse the syslog messages. Here is a Grok expression that can be used to parse such logs format:
 
 ```%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}```
 
-Now that the NiFi flow that will receive the logs are in place, let's go back to the EFM UI and build the MiNiFi flow
+Now that we have built the NiFi flow that will receive the logs, let's go back to the EFM UI and build the MiNiFi flow as below:
 
 ![CEM flow](images/cem-minifi-flow.png)
 
@@ -389,9 +389,13 @@ This MiNiFi agent will tail /var/log/messages and send the logs to a remote proc
 
 ![Tailfile](images/tail-file.png)
 
+Don't forget to increase the scheduler!
+
+Please note that the NiFi instance has been configured to receive data over HTTP only, not RAW
+
 ![Remote process group](images/remote-process-group.png)
 
-Don't forget to start the NiFi flow first then publish the MiNiFi flow to NiFi registry (Actions > Publish...)
+Now we can start the NiFi flow and publish the MiNiFi flow to NiFi registry (Actions > Publish...)
 
 Visit [NiFi Registry UI](http://demo.cloudera.com:61080/nifi-registry/explorer/grid-list) to make sure your flow has been published successfully.
 
