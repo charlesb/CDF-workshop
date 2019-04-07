@@ -3,7 +3,7 @@
 
 ## Prerequisite
 
-- Launch AWS AMI **ami-0754aef50075ce8ac** with **m5d.4xlarge** instance type
+- Launch AWS AMI **ami-08820f3fb1e5a37a4** with **m5d.4xlarge** instance type
 - Keep default storage (300GB SSD)
 - Set security group with:
   - Type: All TCP
@@ -353,6 +353,8 @@ From this query, create a dashboard that will refresh automatically
 
 ## Collect syslog data using MiNiFi and EFM
 
+Go to NiFi Registry and create a bucket named **demo**
+
 As root (sudo su -) start EFM and MiNiFi
 
 ```bash
@@ -365,13 +367,41 @@ You should see heartbeats coming from the agent
 
 ![EFM agents monitor](images/efm-agents-monitor.png)
 
-Now create a simple flow to collect local syslog messages and forward them to NiFi
+Now create a simple flow to collect local syslog messages and forward them to NiFi, where the logs will be parsed, transformed into another format and pushed to a Kafka topic.
 
-Since our agent is tagged with the class 'demo', we are going to create a template under this specific class
+Our agent has been tagged with the class 'demo' (check nifi.c2.agent.class property in /usr/minifi/conf/bootstrap.conf) so we are going to create a template under this specific class
 
-But first we need to add an Input Port to the root canvas of NiFi as and do something interesting with the logs
+But first we need to add an Input Port to the root canvas of NiFi and build a flow as described before
 
 ![NiFi syslog parser](images/nifi-syslog-parser.png)
+
+Don't forget to create a new Kafka topic as explained in Lab 3 above.
+
+We are going to use a Grok parser to parse the syslog messages. Here is a Grok expression that can be used here:
+
+```%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}```
+
+Now that the NiFi flow that will receive the logs are in place, let's go back to the EFM UI and build the MiNiFi flow
+
+![CEM flow](images/cem-minifi-flow.png)
+
+This MiNiFi agent will tail /var/log/messages and send the logs to a remote process group (our NiFi instance) using the Input Port.
+
+![Tailfile](images/tail-file.png)
+
+![Remote process group](images/remote-process-group.png)
+
+Don't forget to start the NiFi flow first then publish the MiNiFi flow to NiFi registry (Actions > Publish...)
+
+Visit [NiFi Registry UI](http://demo.cloudera.com:61080/nifi-registry/explorer/grid-list) to make sure your flow has been published successfully.
+
+![NiFi Registry](images/nifi-registry.png)
+
+Within few seconds, you should be able to see syslog messages streaming through your NiFi flow and be published to the Kafka topic you have created.
+
+![Syslog message](images/syslog-json.png)
+
+
 
 
 
