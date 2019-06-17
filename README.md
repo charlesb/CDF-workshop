@@ -1,4 +1,4 @@
-# HDP & HDF Labs: Real-time sentiment analysis with NiFi, Kafka, Druid, Zeppelin and Superset
+# CDF Labs: Real-time sentiment analysis with NiFi, Kafka, Druid, Zeppelin and Superset
 
 
 ## Prerequisite
@@ -407,9 +407,38 @@ Within few seconds, you should be able to see syslog messages streaming through 
 
 ![Syslog message](images/syslog-json.png)
 
+## Apply for Twitter developer account
 
+Visit [](https://developer.twitter.com/en/apply-for-access.html) and click on Apply for a developer account. If you don't have a Twitter account, sign up.
 
+After you have added a valid email address, follow the different account creation steps
 
+![twitter-account-details](images/twitter-account-details.png)
+
+![twitter-usecase-details](images/twitter-usecase-details.png)
+
+For the use case details, you can reuse the text below:
+
+```
+1. This account will be used for demo, building streaming data flow with real-time sentiment analyses using NiFi, Kafka and Druid
+2. I intend to compare tweets against a machine learning model using NLP techniques for sentiment analysis
+3. My use case does not involve tweeting, retweeting or liking content
+4. Individual tweets will not be displayed, data will be aggregated per sentiment: very negative, negative, neutral, positive and very positive
+```
+
+Agree to the Terms of Services
+
+![twitter-termsofservices-details](images/twitter-termsofservices-details.png)
+
+Finally click on the link from the email you have received and create an app
+
+![twitter-createanapp](images/twitter-createanapp.png)
+
+![twitter-appdetails](images/twitter-appdetails.png)
+
+Finally create the Keys and Tokens that will be needed by the NiFi processor to pull Tweets using the Twitter API
+
+![twitter-keysandtokens](images/twitter-keysandtokens.png)
 
 
 
