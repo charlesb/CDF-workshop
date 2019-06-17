@@ -51,7 +51,7 @@ If services are not started, start all services
 
 ![Image of Ambari Start Services](images/start_services.png)
 
-It can take up to 18 minutes...
+It can take up to 20 minutes...
 
 ![Image of Ambari Starting Services](images/starting_services.png)
 
