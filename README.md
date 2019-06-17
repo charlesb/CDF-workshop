@@ -36,7 +36,7 @@ Add a new line to the existing
 
 Replacing the ip (nn.nnn.nnn.nnn) address with the one provided
 
-### Start all HDP and HDF services
+### Start all HDP and CDF services
 
 Open a web browser and go to the following url
 
@@ -115,7 +115,7 @@ In this scenario we are going to stream all comments, for all topics, into NiFi 
 
 To do that we need to score each comment's content against the Stanford CoreNLP's sentiment model. 
 
-In real-world use case we would probably filter by event of our interest but for the sake of this workshop we won't and assume all comments are given for the same event: the famous HDF workshop!
+In real-world use case we would probably filter by event of our interest but for the sake of this workshop we won't and assume all comments are given for the same event: the famous CDF workshop!
 
 Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps below:
 
@@ -133,7 +133,7 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
 - Step 2: Add an UpdateAttribute connector to the canvas and link from ConnectWebSocket on **text message** relationship
   - Double click on the processor
   - On properties tab add new property **mime.type** clicking on + icon and give the value **application/json**. This will tell the next processor that the messages sent by the Meetup WebSocket is in JSON format.
-  - Add another property **event** to set an event name **HDF workshop** for the purpose of this exercise as explained before
+  - Add another property **event** to set an event name **CDF workshop** for the purpose of this exercise as explained before
   - Apply changes
   
   ![UpdateAtrribute 1 properties](images/updateattibute1properties.png)
@@ -317,7 +317,7 @@ Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps b
   - Change **Use Transactions** value to **false**
   - Apply changes
   
-Before starting the NiFi flow make sure that the [sentiment analysis Web service](https://github.com/charlesb/HDP-HDF-workshop#run-the-sentiment-analysis-model-as-a-rest-like-service) is running
+Before starting the NiFi flow make sure that the [sentiment analysis Web service](https://github.com/charlesb/HDP-CDF-workshop#run-the-sentiment-analysis-model-as-a-rest-like-service) is running
 	
 The overall flow should look like this
 
