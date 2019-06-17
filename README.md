@@ -409,7 +409,7 @@ Within few seconds, you should be able to see syslog messages streaming through 
 
 ## Apply for Twitter developer account
 
-Visit [](https://developer.twitter.com/en/apply-for-access.html) and click on Apply for a developer account. If you don't have a Twitter account, sign up.
+Visit [Twitter developer page](https://developer.twitter.com/en/apply-for-access.html) and click on Apply for a developer account. If you don't have a Twitter account, sign up.
 
 After you have added a valid email address, follow the different account creation steps
 
