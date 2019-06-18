@@ -372,7 +372,7 @@ Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps b
   - Add InvokeHTTP processor and link from ReplaceText on **success** relationship
   - Double click on processor and check all relationships except **Response** on settings tab
   - Go to properties tab and set value for **HTTP Method** to **POST**
-  - Set **Remote URL** with value: ```http://demo.cloudera.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for ***http://demo.cloudera.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}***
+  - Set **Remote URL** with value: ```http://demo.cloudera.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for **http://demo.cloudera.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}**
   - Set **Content-Type** to **application/x-www-form-urlencoded**
   - Apply changes
   
