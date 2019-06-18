@@ -75,38 +75,6 @@ On Windows use [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest
 
 ## Stream data using NiFi
 
-### Run the sentiment analysis model as a REST-like service
-
-For the purpose of this exercise we are not going to train, test and implement a classification model but re-use an existing sentiment analysis model, provided by the Stanford University as part of their [CoreNLP - Natural language software](https://stanfordnlp.github.io/CoreNLP/)
-
-First, after ssh'ing to the sandbox, download and unzip the CoreNLP using the wget as below:
-
-```bash
-wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
-unzip stanford-corenlp-full-2018-10-05.zip
-```
-
-Then, in order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html), run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), with the following commands:
-
-```bash
-cd /path/to/stanford-corenlp-full-2018-10-05
-java -mx1g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9999 -timeout 15000 </dev/null &>/dev/null &
-```
-
-This will run in the background on port 9999 and you can visit the [web page](http://demo.cloudera.com:9999/) to make sure it's running.
-
-If you want to play with it, remove all annotations and use **Sentiment** only
-
-![Image of CoreNLP web service](images/corenlp_web.png)
-
-The model will classify the given text into 5 categories:
-
-- very negative
-- negative
-- neutral
-- positive
-- very positive
-
 ### Build NiFi flow
 
 In order to have a streaming source available for our workshop, we are going to make use of the publicly available Meetup's API and connect to their WebSocket.
@@ -289,6 +257,18 @@ You should be able to see records streaming through Kafka looking at the termina
 
 ![Kafka topic avro](images/kafka_topic_avro.png)
 
+When you are happy with the outcome stop the flow and purge the Kafka topic as we are going to use it later:
+
+```./bin/kafka-configs.sh --zookeeper demo.cloudera.com:2181 --entity-type topics --alter --entity-name meetup_comment_ws --add-config retention.ms=1000```
+
+Wait for few second and set the retention back to one hour:
+
+```./bin/kafka-configs.sh --zookeeper demo.cloudera.com:2181 --entity-type topics --alter --entity-name meetup_comment_ws --add-config retention.ms=3600000```
+
+You can check if the retention was set properly:
+
+```./bin/kafka-configs.sh --zookeeper demo.cloudera.com:2181 --describe --entity-type topics --entity-name meetup_comment_ws```
+
 ## Explore Hive, Druid and Zeppelin
 
 Visit [Zeppelin](http://demo.cloudera.com:9995/) and log in as admin (password: admin)
@@ -342,6 +322,40 @@ Verify that supervisor and indexing task are running from the [Druid overload co
 ![Druid console](images/druid_console.png)
 
 ## Stream enhanced data into Hive using NiFi
+
+### Run the sentiment analysis model as a REST-like service
+
+For the purpose of this exercise we are not going to train, test and implement a classification model but re-use an existing sentiment analysis model, provided by the Stanford University as part of their [CoreNLP - Natural language software](https://stanfordnlp.github.io/CoreNLP/)
+
+First, after ssh'ing to the sandbox, download and unzip the CoreNLP using the wget as below:
+
+```bash
+wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
+unzip stanford-corenlp-full-2018-10-05.zip
+```
+
+Then, in order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html), run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), with the following commands:
+
+```bash
+cd /path/to/stanford-corenlp-full-2018-10-05
+java -mx1g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9999 -timeout 15000 </dev/null &>/dev/null &
+```
+
+This will run in the background on port 9999 and you can visit the [web page](http://demo.cloudera.com:9999/) to make sure it's running.
+
+If you want to play with it, remove all annotations and use **Sentiment** only
+
+![Image of CoreNLP web service](images/corenlp_web.png)
+
+The model will classify the given text into 5 categories:
+
+- very negative
+- negative
+- neutral
+- positive
+- very positive
+
+### Enhance the Meetup comments with sentiment analysis outcome 
 
 Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps below:
 
