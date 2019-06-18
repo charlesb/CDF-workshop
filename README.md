@@ -47,7 +47,7 @@ Log in with the following credential
 Username: admin
 Password: admin
 
-If services are not started, start all services
+If services are not started already, start all services
 
 ![Image of Ambari Start Services](images/start_services.png)
 
@@ -146,6 +146,7 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
     - comment: $.comment
     - member: $.member.member_name
     - timestamp: $.mtime
+    - country: $.group.country
     
     ![EvaluateJsonPath 1 properties](images/evaluatejsonpathproperties1.png)
     
@@ -159,7 +160,8 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
   - Double click on the processor
   - On settings tab, check **failure** relationship
   - Change **Destination** value to **flowfile-content**
-  - Change **Attribute List** value to write only the above parsed attributes: **timestamp, event, member, comment**
+  - Change **Attribute List** value to write only the above parsed attributes: **timestamp,event,member,comment,country**
+  - Set **Include Schema** to **true**
   - Apply changes
   
 - Step 5: Add a PutFile connector to the canvas and link from AttributesToCSV on **success** relationship
@@ -209,6 +211,34 @@ Follow the same steps as above except for the last step where we are going to op
 ```./bin/kafka-console-producer.sh --broker-list demo.cloudera.com:6667 --topic meetup_comment_ws```
 
 Type anything and click enter. Then go back to the first terminal with the consumer running. You should see the same message get displayed!
+
+## Integrate with Schema Registry
+
+Explore [Schema Registry UI](http://demo.cloudera.com:7788/)
+
+Create a new Avro Schema, hitting the plus button, named **meetup_comment_avro** with the following Avro Schema:
+
+```Avro
+{
+     "type": "record",
+     "name": "meetup_comment_avro",
+     "fields": [
+       {"name": "country", "type": "string"},
+       {"name": "member", "type": "string"},
+       {"name": "comment", "type": "string"},
+       {"name": "event", "type": "string"},
+       {"name": "timestamp", "type": "long"}
+       ]
+}
+```
+
+![Avro schema creation](images/avro_schema_creation.png)
+
+You should end up with a newly versioned schema as follow:
+
+![Avro schema versioned](images/avro_schema_versioned.png)
+
+Explore the [REST API](http://demo.cloudera.com:7788/swagger) as well.
 
 ## Explore Hive, Druid and Zeppelin
 
