@@ -244,20 +244,23 @@ Explore the [REST API](http://demo.cloudera.com:7788/swagger) as well.
 
 Remove the last processor PutFile as we are going to stream the avro record to some Kafka topic.
 
-First we need to convert CSV formatted records to Avro records.
+Now we are going to filter the records we are interested in and convert them from CSV to Avro in the process.
 
-- Step 1: Add a ConvertRecord processor to the canvas and link from AttributesToCSV on **success** relationship
+- Step 1: Add a QueryRecord processor to the canvas and link from AttributesToCSV on **success** relationship
   - Double click on the processor
-  - On settings tab, check **failure** relationship
   - On properties tab
   	- For RecordReader, create a CSVReader service
   	- For RecordWrite, create a AvroRecordSetWriter service
   	- Configure both services
   	  - For CSVReader, use String Fields From Header for the Schema Access Strategy
   	  - For AvroRecordSetWriter, we are going to connect to the Schema Registry API (http://demo.cloudera.com:7788/api/v1) and use the avro schema created before
+  	- Filter comments per country as our sentiment analysis model supports English only
+  	  - Add a property **comments_in_english** with value ```SELECT * FROM FLOWFILE WHERE country IN ('gb', 'us', 'sg')```
+  	- Set **Include Zero Record FlowFiles** to false
+  - On settings tab, check **failure** and **original** relationships
   - Apply changes
   
-![Convert Record 1](images/convert_record_1.png)
+![Query Record](images/query_record.png)
 
 ![CSVReader](images/csv_reader.png)
 
@@ -268,6 +271,23 @@ Set the HortonworksSchemaRegistry controller service as follow
 ![HWXSchemaRegistry](images/hwx_schema_registry.png)
 
 Enable all controller services.
+
+- Step 2: Add a **PublishKafka_2_0** connector to the canvas and link from AttributesToJSON on **comments_in_english** relationship
+  - Double click on the processor
+  - On settings tab, check all relationships
+  - On properties tab
+  - Change **Kafka Brokers** value to **demo.cloudera.com:6667**
+  - Change **Topic Name** value to **meetup_comment_ws**
+  - Change **Use Transactions** value to **false**
+  - Apply changes
+
+The flow should look like this:
+
+![Avro records to Kafka topic](images/avro_records_to_kafka_topic.png)
+
+You should be able to see records streaming through Kafka looking at the terminal with Kafka consumer opened earlier
+
+![Kafka topic avro](images/kafka_topic_avro.png)
 
 ## Explore Hive, Druid and Zeppelin
 
@@ -376,7 +396,7 @@ Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps b
   - Change **Use Transactions** value to **false**
   - Apply changes
   
-Before starting the NiFi flow make sure that the [sentiment analysis Web service](https://github.com/charlesb/HDP-CDF-workshop#run-the-sentiment-analysis-model-as-a-rest-like-service) is running
+Before starting the NiFi flow make sure that the [sentiment analysis Web service](https://github.com/charlesb/CDF-workshop#run-the-sentiment-analysis-model-as-a-rest-like-service) is running
 	
 The overall flow should look like this
 
