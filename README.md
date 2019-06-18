@@ -17,10 +17,12 @@
 * [Lab 1 - Accessing the sandbox](#accessing-the-sandbox)
 * [Lab 2 - Stream data using NiFi](#stream-data-using-nifi)
 * [Lab 3 - Explore Kafka](#explore-kafka)
-* [Lab 4 - Explore Hive, Druid and Zeppelin](#explore-hive-druid-and-zeppelin)
-* [Lab 5 - Stream enhanced data into Hive using NiFi](#stream-enhanced-data-into-hive-using-nifi)
-* [Lab 6 - Create live dashboard with Superset](#create-live-dashboard-with-superset)
-* [Lab 7 - Collect syslog data using MiNiFi and EFM](#collect-syslog-data-using-minifi-and-efm)
+* [Lab 4 - Integrate with Schema Registry](#integrate-with-schema-registry)
+* [Lab 5 - Explore Hive, Druid and Zeppelin](#explore-hive-druid-and-zeppelin)
+* [Lab 6 - Stream enhanced data into Hive using NiFi](#stream-enhanced-data-into-hive-using-nifi)
+* [Lab 7 - Create live dashboard with Superset](#create-live-dashboard-with-superset)
+* [Lab 8 - Collect syslog data using MiNiFi and EFM](#collect-syslog-data-using-minifi-and-efm)
+* [Bonus - Process sentiment analysis on tweets](#process-sentiment-analysis-on-tweets)
 
 ## Accessing the sandbox
 
@@ -156,7 +158,7 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
     {"visibility":"public","member":{"member_id":11643711,"photo":"https:\/\/secure.meetupstatic.com\/photos\/member\/3\/1\/6\/8\/thumb_273072648.jpeg","member_name":"Loka Murphy"},"comment":"I didn’t when I registered but now thinking I want to try and get one since it’s only taking place once.","id":-259414201,"mtime":1541557753087,"event":{"event_name":"Tunnel to Viaduct 8k Run","event_id":"256109695"},"table_name":"event_comment","group":{"join_mode":"open","country":"us","city":"Seattle","name":"Seattle Green Lake Running Group","group_lon":-122.34,"id":1608555,"state":"WA","urlname":"Seattle-Greenlake-Running-Group","category":{"name":"fitness","id":9,"shortname":"fitness"},"group_photo":{"highres_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/highres_465640692.jpeg","photo_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/600_465640692.jpeg","photo_id":465640692,"thumb_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/thumb_465640692.jpeg"},"group_lat":47.61},"in_reply_to":496130460,"status":"active"}
     ```
 
-- Step 4: Add an AttributesToCSV connector to the canvas and link from EvaluateJsonPath on **matched** relationship
+- Step 4: Add an AttributesToCSV processor to the canvas and link from EvaluateJsonPath on **matched** relationship
   - Double click on the processor
   - On settings tab, check **failure** relationship
   - Change **Destination** value to **flowfile-content**
@@ -164,7 +166,7 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
   - Set **Include Schema** to **true**
   - Apply changes
   
-- Step 5: Add a PutFile connector to the canvas and link from AttributesToCSV on **success** relationship
+- Step 5: Add a PutFile processor to the canvas and link from AttributesToCSV on **success** relationship
   - Double click on the processor
   - On settings tab, check all relationships
   - Change **Directory** value to **/tmp/workshop**
@@ -239,6 +241,33 @@ You should end up with a newly versioned schema as follow:
 ![Avro schema versioned](images/avro_schema_versioned.png)
 
 Explore the [REST API](http://demo.cloudera.com:7788/swagger) as well.
+
+Remove the last processor PutFile as we are going to stream the avro record to some Kafka topic.
+
+First we need to convert CSV formatted records to Avro records.
+
+- Step 1: Add a ConvertRecord processor to the canvas and link from AttributesToCSV on **success** relationship
+  - Double click on the processor
+  - On settings tab, check **failure** relationship
+  - On properties tab
+  	- For RecordReader, create a CSVReader service
+  	- For RecordWrite, create a AvroRecordSetWriter service
+  	- Configure both services
+  	  - For CSVReader, use String Fields From Header for the Schema Access Strategy
+  	  - For AvroRecordSetWriter, we are going to connect to the Schema Registry API (http://demo.cloudera.com:7788/api/v1) and use the avro schema created before
+  - Apply changes
+  
+![Convert Record 1](images/convert_record_1.png)
+
+![CSVReader](images/csv_reader.png)
+
+![AvroRecordSetWriter](images/avro_record_set_writer.png)
+
+Set the HortonworksSchemaRegistry controller service as follow
+
+![HWXSchemaRegistry](images/hwx_schema_registry.png)
+
+Enable all controller services.
 
 ## Explore Hive, Druid and Zeppelin
 
@@ -437,7 +466,9 @@ Within few seconds, you should be able to see syslog messages streaming through 
 
 ![Syslog message](images/syslog-json.png)
 
-## Apply for Twitter developer account
+## Process sentiment analysis on tweets
+
+### Apply for Twitter developer account (skip this if you have a dev account already)
 
 Visit [Twitter developer page](https://developer.twitter.com/en/apply-for-access.html) and click on Apply for a developer account. If you don't have a Twitter account, sign up.
 
