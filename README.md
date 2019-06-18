@@ -357,30 +357,26 @@ The model will classify the given text into 5 categories:
 
 ### Enhance the Meetup comments with sentiment analysis outcome 
 
-Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps below:
+Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps below. Between the QueryRecord and PublishKafka_2_0 processors we are going to enhance the Meetup comment with NLP.
 
-- Step 1: Remove no longer needed processor from previous flow
-  - Right click on the relationship between EvaluateJsonPath and AttibutesToCSV processors and delete
-  - Delete the AttibutesToCSV processor
-  - Do the same for the PutFile processor
-  
-- Step 2: Prepare the content to be posted to the sentiment analysis service
-  - Add ReplaceText processor and link from EvaluateJSonPath on **matched** relationship
+- Step 1: Prepare the content to be posted to the sentiment analysis service
+  - Add ReplaceText processor and link from QueryRecord on **comments_in_english** relationship
+  - Keep the PublishKafka_2_0 processor on the canvas unlinked from/to other processors for now
   - Double click on processor and check **failure** on settings tab
   - Go to properties tab and remove value for **Search Value** and set it to empty string
   - Set **Replacement Value** with value: **${comment:replaceAll('\\.', ';')}**. We want to make sure the entire comment is evaluated as one sentence instead of one evaluation per sentence within the same comment.
   - Set **Replacement Strategy** to **Always Replace**
   - Apply changes
   
-- Step 3: Call the web service started earlier on incoming message
+- Step 2: Call the web service started earlier on incoming message
   - Add InvokeHTTP processor and link from ReplaceText on **success** relationship
   - Double click on processor and check all relationships except **Response** on settings tab
   - Go to properties tab and set value for **HTTP Method** to **POST**
-  - Set **Remote URL** with value: ```http://demo.cloudera.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for ```http://demo.cloudera.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}```
+  - Set **Remote URL** with value: ```http://demo.cloudera.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for ***http://demo.cloudera.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}***
   - Set **Content-Type** to **application/x-www-form-urlencoded**
   - Apply changes
   
-- Step 4: Add EvaluateJsonPath to the canvas and link from InvokeHTTP on **Response** relationship
+- Step 3: Add EvaluateJsonPath to the canvas and link from InvokeHTTP on **Response** relationship
   - Double click on the processor
   - On settings tab, check both **failure** and **unmatched** relationships
   - On properties tab
@@ -388,11 +384,11 @@ Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps b
   - Add on the property **sentiment** with value **$.sentences[0].sentiment**
   - Apply changes
   
-- Step 5: Format post time to comply with [ISO format](https://en.wikipedia.org/wiki/ISO_8601) (Druid requirement)
+- Step 4: Format post time to comply with [ISO format](https://en.wikipedia.org/wiki/ISO_8601) (Druid requirement)
   - Add UpdateAttribute processor and link from EvaluateJsonPath on **matched** relationship
   - Using handy [NiFi's language expression](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html#dates), add a new attribue ```__time``` with value: ```${timestamp:format("yyyy-MM-dd'T'HH:mm:ss'Z'", "Asia/Singapore")}``` to properties tab
 
-- Step 6: Add AttributesToJSON processor to prepare the message to be published to the Kafka topic created before. Link from UpdateAttribute.
+- Step 5: Add AttributesToJSON processor to prepare the message to be published to the Kafka topic created before. Link from UpdateAttribute.
   - Double click on processor
   - On settings tab, check **failure** relationship
   - Go to properties tab
@@ -401,14 +397,7 @@ Go back to [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps b
   - Set Include Core Attributes to **false**
   - Apply changes
   
-- Step 7: Last step, add a **PublishKafka_2_0** connector to the canvas and link from AttributesToJSON on **success** relationship
-  - Double click on the processor
-  - On settings tab, check all relationships
-  - On properties tab
-  - Change **Kafka Brokers** value to **demo.cloudera.com:6667**
-  - Change **Topic Name** value to **meetup_comment_ws**
-  - Change **Use Transactions** value to **false**
-  - Apply changes
+- Step 6: Last step, link existing **PublishKafka_2_0** connector to the canvas from AttributesToJSON on **success** relationship
   
 Before starting the NiFi flow make sure that the [sentiment analysis Web service](https://github.com/charlesb/CDF-workshop#run-the-sentiment-analysis-model-as-a-rest-like-service) is running
 	
