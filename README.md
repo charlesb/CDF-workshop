@@ -491,7 +491,7 @@ Within few seconds, you should be able to see syslog messages streaming through 
 
 ## Process sentiment analysis on tweets
 
-### Apply for Twitter developer account (skip this if you have a dev account already)
+### Apply for Twitter developer account and create an app
 
 Visit [Twitter developer page](https://developer.twitter.com/en/apply-for-access.html) and click on Apply for a developer account. If you don't have a Twitter account, sign up.
 
@@ -522,7 +522,7 @@ Finally click on the link from the email you have received and create an app
 
 Finally create the Keys and Tokens that will be needed by the NiFi processor to pull Tweets using the Twitter API
 
-<!--[twitter-keysandtokens](images/twitter-keysandtokens.png)-->
+![twitter-keysandtokens](images/twitter-keysandtokens.png)
 
 
 
