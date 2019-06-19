@@ -522,9 +522,7 @@ Finally click on the link from the email you have received and create an app
 
 Finally create the Keys and Tokens that will be needed by the NiFi processor to pull Tweets using the Twitter API
 
-![twitter-keysandtokens](images/twitter-keysandtokens.png)
-
-
+<!--[twitter-keysandtokens](images/twitter-keysandtokens.png)-->
 
 
 
