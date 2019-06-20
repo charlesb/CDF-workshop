@@ -81,9 +81,15 @@ In order to have a streaming source available for our workshop, we are going to 
 
 The API documentation is available [here](https://www.meetup.com/meetup_api/docs/stream/2/event_comments/#websockets): https://www.meetup.com/meetup_api/docs/stream/2/event_comments/#websockets
 
-In this scenario we are going to stream all comments, for all topics, into NiFi and classify each one of them into the 5 categories listed above. 
+In this workshop we are going to stream all comments, for all topics, into NiFi and classify each one of them into the 5 categories listed below:
 
-To do that we need to score each comment's content against the Stanford CoreNLP's sentiment model. 
+- very negative
+- negative
+- neutral
+- positive
+- very positive 
+
+To do so we will score each comment against the Stanford CoreNLP's sentiment model as we will see [later](https://github.com/charlesb/CDF-workshop#run-the-sentiment-analysis-model-as-a-rest-like-service). 
 
 In real-world use case we would probably filter by event of our interest but for the sake of this workshop we won't and assume all comments are given for the same event: the famous CDF workshop!
 
@@ -523,6 +529,26 @@ Finally click on the link from the email you have received and create an app
 Finally create the Keys and Tokens that will be needed by the NiFi processor to pull Tweets using the Twitter API
 
 ![twitter-keysandtokens](images/twitter-keysandtokens.png)
+
+## Create a NiFi flow
+
+- Step 1: Get the tweets to be analysed
+  - Add GetTwitter processor to the canvas
+  - **Important!** From Scheduling tab change Run Schedule property to **2 sec**
+  - On the Properties tab
+    - Set Twitter Endpoint to **Filter Endpoint**
+    - Fill the Consumer Key, Consumer Secret, Access Token and Access Token Secret with the app keys and token
+    - Set Languages to **en**
+    - Provide a set of Terms to Filter On, i.e. 'cloudera'
+  - Apply changes
+  
+- Step 2: Call the web service started earlier on incoming message
+  - Add InvokeHTTP processor and link from ReplaceText on **success** relationship
+  - Double click on processor and check all relationships except **Response** on settings tab
+  - Go to properties tab and set value for **HTTP Method** to **POST**
+  - Set **Remote URL** with value: ```http://demo.cloudera.com:9999/?properties=%7B%22annotators%22%3A%22sentiment%22%2C%22outputFormat%22%3A%22json%22%7D``` which is the url encoded value for **http://demo.cloudera.com:9999/?properties={"annotators":"sentiment","outputFormat":"json"}**
+  - Set **Content-Type** to **application/x-www-form-urlencoded**
+  - Apply changes
 
 
 
