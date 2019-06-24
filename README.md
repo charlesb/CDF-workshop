@@ -249,7 +249,7 @@ Remove the last processor PutFile as we are going to stream the avro record to s
 
 Now we are going to filter the records we are interested in and convert them from CSV to Avro in the process.
 
-- Step 1: Add a QueryRecord processor to the canvas and link from AttributesToCSV on **success** relationship
+- Step 1: Remove the existing PutFile processor and add a QueryRecord processor to the canvas and link from AttributesToCSV on **success** relationship
   - Double click on the processor
   - On properties tab
   	- For RecordReader, create a CSVReader service
