@@ -95,7 +95,27 @@ In real-world use case we would probably filter by event of our interest but for
 
 Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and follow the steps below:
 
-- Step 1: Add a ConnectWebSocket processor to the canvas
+- Step 1: Drag on drop a Process Group on the root canvas and name it **CDF Workshop**
+
+![CDF Workshop process group](images/cdfprocessgroup.png)
+
+- Step 2: Go to [NiFi Registry](http://demo.cloudera.com:61080/nifi-registry/explorer/grid-list) and create a new bucket
+  - Click on the little wrench icon at the top right corner
+  - Click on the **NEW BUCKET** button
+  - Name the bucket ***workshop*
+  
+![NiFi Registry bucket creation](images/registry-bucket.png)
+
+- Step 3: Go back to NiFi UI and right click on the previously created process group
+  - Click on Version > Start version control
+  - Then provide at least a Flow Name
+  - Click on Save
+
+![Version control](images/version-control.png)
+
+![Version control 2](images/version-control-2.png)
+
+- Step 4: Get in the CDF Workshop (double click on the process group) and add a **ConnectWebSocket** processor to the canvas
   - Double click on the processor
   - On settings tab, check all relationships except **text message**
   - Got to properties tab and select or create **JettyWebSocketClient** as the WebSocket Client ControllerService
@@ -106,15 +126,15 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
   - Go to properties tab and give a value to **WebSocket Client Id** such as **demo** for example
   - Apply changes
   
-- Step 2: Add an UpdateAttribute connector to the canvas and link from ConnectWebSocket on **text message** relationship
+- Step 5: Add an UpdateAttribute connector to the canvas and link from ConnectWebSocket on **text message** relationship
   - Double click on the processor
   - On properties tab add new property **mime.type** clicking on + icon and give the value **application/json**. This will tell the next processor that the messages sent by the Meetup WebSocket is in JSON format.
   - Add another property **event** to set an event name **CDF workshop** for the purpose of this exercise as explained before
   - Apply changes
   
-  ![UpdateAtrribute 1 properties](images/updateattibute1properties.png)
+![UpdateAtrribute 1 properties](images/updateattibute1properties.png)
   
-- Step 3: Add EvaluateJsonPath to the canvas and link from UpdateAttribute on **success** relationship
+- Step 6: Add EvaluateJsonPath to the canvas and link from UpdateAttribute on **success** relationship
   - Double click on the processor
   - On settings tab, check both **failure** and **unmatched** relationships
   - On properties tab, change **Destination** value to **flowfile-attribute**
@@ -124,7 +144,7 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
     - timestamp: $.mtime
     - country: $.group.country
     
-    ![EvaluateJsonPath 1 properties](images/evaluatejsonpathproperties1.png)
+![EvaluateJsonPath 1 properties](images/evaluatejsonpathproperties1.png)
     
     The messages coming out of the web sockets look like this:
     
@@ -132,7 +152,7 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
     {"visibility":"public","member":{"member_id":11643711,"photo":"https:\/\/secure.meetupstatic.com\/photos\/member\/3\/1\/6\/8\/thumb_273072648.jpeg","member_name":"Loka Murphy"},"comment":"I didn’t when I registered but now thinking I want to try and get one since it’s only taking place once.","id":-259414201,"mtime":1541557753087,"event":{"event_name":"Tunnel to Viaduct 8k Run","event_id":"256109695"},"table_name":"event_comment","group":{"join_mode":"open","country":"us","city":"Seattle","name":"Seattle Green Lake Running Group","group_lon":-122.34,"id":1608555,"state":"WA","urlname":"Seattle-Greenlake-Running-Group","category":{"name":"fitness","id":9,"shortname":"fitness"},"group_photo":{"highres_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/highres_465640692.jpeg","photo_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/600_465640692.jpeg","photo_id":465640692,"thumb_link":"https:\/\/secure.meetupstatic.com\/photos\/event\/9\/e\/f\/4\/thumb_465640692.jpeg"},"group_lat":47.61},"in_reply_to":496130460,"status":"active"}
     ```
 
-- Step 4: Add an AttributesToCSV processor to the canvas and link from EvaluateJsonPath on **matched** relationship
+- Step 7: Add an AttributesToCSV processor to the canvas and link from EvaluateJsonPath on **matched** relationship
   - Double click on the processor
   - On settings tab, check **failure** relationship
   - Change **Destination** value to **flowfile-content**
@@ -140,13 +160,22 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
   - Set **Include Schema** to **true**
   - Apply changes
   
-- Step 5: Add a PutFile processor to the canvas and link from AttributesToCSV on **success** relationship
+- Step 8: Add a PutFile processor to the canvas and link from AttributesToCSV on **success** relationship
   - Double click on the processor
   - On settings tab, check all relationships
   - Change **Directory** value to **/tmp/workshop**
   - Apply changes
-  
-- Step 6: Start the entire flow
+
+- Step 9: Right-click anywhere on the canvas and commit your first flow!
+
+![NiFi commit 1](images/commit-1.png)
+![NiFi commit 2](images/commit-2.png)
+
+If you visit the [NiFi Registry UI](http://demo.cloudera.com:61080/nifi-registry/explorer/grid-list) again you should see your commit.
+
+![NiFi commit 3](images/commit-3.png)
+
+- Step 10: Start the entire flow
 
 ![NiFi Flow 1](images/flow1.png)
 
