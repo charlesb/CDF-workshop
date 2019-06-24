@@ -102,7 +102,7 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
 - Step 2: Go to [NiFi Registry](http://demo.cloudera.com:61080/nifi-registry/explorer/grid-list) and create a new bucket
   - Click on the little wrench icon at the top right corner
   - Click on the **NEW BUCKET** button
-  - Name the bucket ***workshop*
+  - Name the bucket **workshop**
   
 ![NiFi Registry bucket creation](images/registry-bucket.png)
 
