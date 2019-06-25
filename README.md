@@ -256,7 +256,7 @@ Now we are going to filter the records we are interested in and convert them fro
   	- For RecordWrite, create a AvroRecordSetWriter service
   	- Configure both services
   	  - For CSVReader, use String Fields From Header for the Schema Access Strategy
-  	  - For AvroRecordSetWriter, we are going to connect to the Schema Registry API (http://demo.cloudera.com:7788/api/v1) and use the avro schema created before
+  	  - For AvroRecordSetWriter, we are going to connect to the Schema Registry API (http://demo.cloudera.com:7788/api/v1) and use the avro schema created before. For the **Schema Registry** property choose **HortonworksSchemaRegistry** as shown in the screen shot below and configure it.
   	- Filter comments per country as our sentiment analysis model supports English only
   	  - Add a property **comments_in_english** with value ```SELECT * FROM FLOWFILE WHERE country IN ('gb', 'us', 'sg')```
   	- Set **Include Zero Record FlowFiles** to false
