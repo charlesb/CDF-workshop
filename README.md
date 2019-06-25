@@ -288,6 +288,8 @@ The flow should look like this:
 
 ![Avro records to Kafka topic](images/avro_records_to_kafka_topic.png)
 
+Again commit your changes and start the flow!
+
 You should be able to see records streaming through Kafka looking at the terminal with Kafka consumer opened earlier
 
 ![Kafka topic avro](images/kafka_topic_avro.png)
