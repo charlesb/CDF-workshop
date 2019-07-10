@@ -277,7 +277,7 @@ Set the HortonworksSchemaRegistry controller service as follow
 
 Enable all controller services.
 
-- Step 2: Add a **PublishKafka_2_0** connector to the canvas and link from AttributesToJSON on **comments_in_english** relationship
+- Step 2: Add a **PublishKafka_2_0** connector to the canvas and link from QueryRecord on **comments_in_english** relationship
   - Double click on the processor
   - On settings tab, check all relationships
   - On properties tab
