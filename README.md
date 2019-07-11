@@ -46,6 +46,8 @@ To get this private ip, ssh to the instance and type the command ```ifconfig```,
 
 ### Start all HDP and CDF services
 
+**They should be already started**
+
 Open a web browser and go to the following url
 
 ```http://demo.cloudera.com:8080/```
