@@ -38,6 +38,12 @@ Add a new line to the existing
 
 Replacing the ip (nn.nnn.nnn.nnn) address with the one provided
 
+If you can't edit the hosts file due to lack of privileges, then you will need to replace the reference to demo.cloudera.com alias with the instance private ip wherever it's used by a NiFi processor.
+
+To get this private ip, ssh to the instance and type the command ```ifconfig```, the first ip starting with 172 is the one to use:
+
+![Private IP](images/private-ip.png)
+
 ### Start all HDP and CDF services
 
 Open a web browser and go to the following url
