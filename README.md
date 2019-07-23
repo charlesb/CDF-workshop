@@ -165,6 +165,7 @@ Let's get started... Open [NiFi UI](http://demo.cloudera.com:9090/nifi/) and fol
   - On settings tab, check **failure** relationship
   - Change **Destination** value to **flowfile-content**
   - Change **Attribute List** value to write only the above parsed attributes: **timestamp,event,member,comment,country**
+  - Set Include Core Attributes to **false**
   - Set **Include Schema** to **true**
   - Apply changes
   
