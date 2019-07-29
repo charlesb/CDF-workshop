@@ -67,7 +67,7 @@ It can take up to 20 minutes...
 
 ### SSH to the sandbox
 
-**Copy and paste** (do not download) the content of [ppk](keys/hdp-workshop.ppk) for Windows or [pem](keys/hdp-workshop.pem) for Mac OS X
+**Copy and paste** (do not download) the content of [ppk](https://raw.githubusercontent.com/charlesb/CDF-workshop/master/keys/hdp-workshop.ppk) for Windows or [pem](https://raw.githubusercontent.com/charlesb/CDF-workshop/master/keys/hdp-workshop.pem) for Mac OS X
 
 On Mac use the terminal to SSH
 
