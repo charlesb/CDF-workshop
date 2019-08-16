@@ -321,7 +321,7 @@ You can check if the retention was set properly:
 
 Before we implement the next workflow, we need to create one Hive external table and start the corresponding Druid source indexing
 
-Visit [DAS](http://demo.cloudera.com:30800/)
+Visit [Data Analytics Studio (DAS)](http://demo.cloudera.com:30800/)
 
 Click on the **COMPOSE QUERY** button and run the queries below
 
@@ -485,23 +485,117 @@ From this query, create a dashboard that will refresh automatically
 
 ## Collect syslog data using MiNiFi and EFM
 
-Go to NiFi Registry and create a bucket named **demo**
-
-As root (sudo su -) start EFM and MiNiFi
-
-```bash
-service efm start
-service minifi start
-```
 Visit [EFM UI](http://demo.cloudera.com:10080/efm/ui/)
 
-You should see heartbeats coming from the agent
+![EFM UI](images/efm-ui.png)
 
-![EFM agents monitor](images/efm-agents-monitor.png)
+Click on the **EVENTS** tab. List is empty as we havent deployed any MiNiFi agent yet.
 
-Now, **on the root canvas**, create a simple flow to collect local syslog messages and forward them to NiFi, where the logs will be parsed, transformed into another format and pushed to a Kafka topic.
+![EFM Event 1](images/efm-event-1.png)
 
-Our agent has been tagged with the class 'demo' (check nifi.c2.agent.class property in /usr/minifi/conf/bootstrap.conf) so we are going to create a template under this specific class
+A MiNiFi C++ archive (nifi-minifi-cpp-centos-0.7.0-bin.tar.gz) as been uploaded to **/home/centos** already. Deploy it, configure and start it as follow:
+
+```bash
+cd /home/centos
+tar -xvf nifi-minifi-cpp-centos-0.7.0-bin.tar.gz
+cd nifi-minifi-cpp-0.7.0
+mv conf/minifi.properties conf/minifi.properties.bk
+vim conf/minifi.properties
+```
+
+And copy/paste this [content](https://raw.githubusercontent.com/charlesb/CDF-workshop/master/minifi/minifi.properties)):
+
+```properties
+# Core Properties #
+nifi.version=0.7.0
+nifi.flow.configuration.file=./conf/config.yml
+nifi.administrative.yield.duration=30 sec
+# If a component has no work to do (is "bored"), how long should we wait before checking again for work?
+nifi.bored.yield.duration=10 millis
+
+# Provenance Repository #
+nifi.provenance.repository.directory.default=/home/centos/nifi-minifi-cpp-0.7.0/provenance_repository
+nifi.provenance.repository.max.storage.time=1 MIN
+nifi.provenance.repository.max.storage.size=1 MB
+nifi.flowfile.repository.directory.default=/home/centos/nifi-minifi-cpp-0.7.0/flowfile_repository
+nifi.database.content.repository.directory.default=/home/centos/nifi-minifi-cpp-0.7.0/content_repository
+
+#nifi.remote.input.secure=true
+#nifi.security.need.ClientAuth=
+#nifi.security.client.certificate=
+#nifi.security.client.private.key=
+#nifi.security.client.pass.phrase=
+#nifi.security.client.ca.certificate=
+
+#nifi.rest.api.user.name=admin
+#nifi.rest.api.password=password
+
+## Enabling C2 Uncomment each of the following options
+## define those with missing options
+nifi.c2.enable=true
+## define protocol parameters
+## The default is CoAP, if that extension is built. 
+## Alternatively, you may use RESTSender if http-curl is built
+nifi.c2.agent.protocol.class=RESTSender
+#nifi.c2.agent.coap.host=
+#nifi.c2.agent.coap.port=
+## base URL of the c2 server,
+## very likely the same base url of rest urls
+#nifi.c2.flow.base.url=
+nifi.c2.rest.url=http://demo.cloudera.com:10080/efm/api/c2-protocol/heartbeat
+nifi.c2.rest.url.ack=http://demo.cloudera.com:10080/efm/api/c2-protocol/acknowledge
+nifi.c2.root.classes=DeviceInfoNode,AgentInformation,FlowInformation
+## heartbeat 4 times a second
+nifi.c2.agent.heartbeat.period=1000
+## define parameters about your agent 
+nifi.c2.agent.class=cdfws
+nifi.c2.agent.identifier=cdfws
+## define metrics reported
+nifi.c2.root.class.definitions=metrics
+nifi.c2.root.class.definitions.metrics.name=metrics
+nifi.c2.root.class.definitions.metrics.metrics=typedmetrics
+nifi.c2.root.class.definitions.metrics.metrics.typedmetrics.name=RuntimeMetrics
+nifi.c2.root.class.definitions.metrics.metrics.queuemetrics.name=QueueMetrics
+nifi.c2.root.class.definitions.metrics.metrics.queuemetrics.classes=QueueMetrics
+nifi.c2.root.class.definitions.metrics.metrics.typedmetrics.classes=ProcessMetrics,SystemInformation
+nifi.c2.root.class.definitions.metrics.metrics.processorMetrics.name=ProcessorMetric
+nifi.c2.root.class.definitions.metrics.metrics.processorMetrics.classes=GetFileMetrics
+
+## enable the controller socket provider on port 9998
+## off by default. C2 must be enabled to support these
+controller.socket.host=demo.cloudera.com
+controller.socket.port=9998
+
+
+#JNI properties
+nifi.framework.dir=/home/centos/nifi-minifi-cpp-0.7.0/minifi-jni/lib
+nifi.nar.directory=/home/centos/nifi-minifi-cpp-0.7.0/minifi-jni/nars
+nifi.nar.deploy.directory=/home/centos/nifi-minifi-cpp-0.7.0/minifi-jni/nardeploy
+nifi.nar.docs.directory=/home/centos/nifi-minifi-cpp-0.7.0/minifi-jni/nardocs
+# must be comma separated 
+nifi.jvm.options=-Xmx1G
+nifi.python.processor.dir=/home/centos/nifi-minifi-cpp-0.7.0/minifi-python/
+
+c2.agent.heartbeat.reporter.classes=RESTReceiver
+```
+
+Then start MiNiFi agent with sudo using the command below:
+
+```bash
+sudo ./bin/minifi.sh start
+```
+
+The EFM UI Events tab should show some heartbeats now
+
+![EFM Event 1](images/efm-event-2.png)
+
+Before we create a flow we need to create a bucket
+
+Go to [NiFi Registry](http://demo.cloudera.com:61080/nifi-registry/explorer/grid-list) and create a bucket named **efm_demo**
+
+Now, **on the NiFi root canvas**, create a simple flow to collect local syslog messages and forward them to NiFi, where the logs will be parsed, transformed into another format and pushed to a Kafka topic.
+
+Our agent has been tagged with the class 'cdfws' so we are going to create a template under this specific class.
 
 But first we need to add an Input Port to the root canvas of NiFi and build a flow as described before. Input Port are used to receive flow files from remote MiNiFi agents or other NiFi instances.
 
@@ -520,8 +614,6 @@ Now that we have built the NiFi flow that will receive the logs, let's go back t
 This MiNiFi agent will tail /var/log/messages and send the logs to a remote process group (our NiFi instance) using the Input Port.
 
 ![Tailfile](images/tail-file.png)
-
-Don't forget to increase the scheduler!
 
 Please note that the NiFi instance has been configured to receive data over HTTP only, not RAW
 
