@@ -1,11 +1,11 @@
-# CDF Labs: Real-time sentiment analysis with NiFi, Kafka, Druid, Zeppelin and Superset
+# CDF Labs: Real-time sentiment analysis with NiFi, Kafka, Druid, DAS and Superset
 
 
 ## Prerequisite
 
 **Although this AMI is not public and is available for Cloudera workhops only, the steps can be reproduced in your own environment**
 
-- Launch AWS AMI **ami-08820f3fb1e5a37a4** with **m5d.4xlarge** instance type
+- Launch AWS AMI **ami-009b8088cc86ad145** in Asia Pacific Singpore region (ap-southeast-1) with **m5d.4xlarge** instance type
 - Keep default storage (300GB SSD)
 - Set security group with:
   - Type: All TCP
@@ -18,7 +18,7 @@
 * [Lab 2 - Stream data using NiFi](#stream-data-using-nifi)
 * [Lab 3 - Explore Kafka](#explore-kafka)
 * [Lab 4 - Integrate with Schema Registry](#integrate-with-schema-registry)
-* [Lab 5 - Explore Hive, Druid and Zeppelin](#explore-hive-druid-and-zeppelin)
+* [Lab 5 - Explore DAS, Hive and Druid](#explore-das-hive-and-druid)
 * [Lab 6 - Stream enhanced data into Hive using NiFi](#stream-enhanced-data-into-hive-using-nifi)
 * [Lab 7 - Create live dashboard with Superset](#create-live-dashboard-with-superset)
 * [Lab 8 - Collect syslog data using MiNiFi and EFM](#collect-syslog-data-using-minifi-and-efm)
@@ -317,17 +317,15 @@ You can check if the retention was set properly:
 
 ```./bin/kafka-configs.sh --zookeeper demo.cloudera.com:2181 --describe --entity-type topics --entity-name meetup_comment_ws```
 
-## Explore Hive, Druid and Zeppelin
+## Explore DAS, Hive and Druid
 
-Visit [Zeppelin](http://demo.cloudera.com:9995/) and log in as admin (password: admin)
+Before we implement the next workflow, we need to create one Hive external table and start the corresponding Druid source indexing
 
-Create a new note(book) called Demo (use jdbc as default interpreter)
+Visit [DAS](http://demo.cloudera.com:30800/)
 
-![Zeppelin note creation](images/zeppelin_create_note.png)
+Click on the **COMPOSE QUERY** button and run the queries below
 
-Add the interpreter to connect to Hive LLAP
-
-```%jdbc(hive_interactive)```
+![DAS Query](images/das-worksheet.png)
 
 Create a database named workshop and run the SQL
 
@@ -356,14 +354,14 @@ TBLPROPERTIES (
 "druid.kafka.ingestion.consumer.retries" = "2"
 );
 ```
-
-![Zeppelin create DB and table](images/zeppelin_create_db_and_table.png)
-
 Start Druid indexing
 
 ```SQL
 ALTER TABLE workshop.meetup_comment_sentiment SET TBLPROPERTIES('druid.kafka.ingestion' = 'START');
 ```
+
+![DAS show tables](images/das-show-tables.png)
+
 
 Verify that supervisor and indexing task are running from the [Druid overload console](http://demo.cloudera.com:8090/console.html)
 
@@ -385,7 +383,7 @@ unzip stanford-corenlp-full-2018-10-05.zip
 Then, in order to start the [web service](https://stanfordnlp.github.io/CoreNLP/corenlp-server.html), run the [CoreNLP jar file](https://stanfordnlp.github.io/CoreNLP/download.html), with the following commands:
 
 ```bash
-cd /path/to/stanford-corenlp-full-2018-10-05
+cd stanford-corenlp-full-2018-10-05
 java -mx1g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port 9999 -timeout 15000 </dev/null &>/dev/null &
 ```
 
@@ -457,9 +455,11 @@ You should be able to see records streaming through Kafka looking at the termina
 
 ![Kafka topic consumer](images/kafka_topic_consumer.png)
 
-Going back to Zeppelin, we can query the data streamed in real-time
+Going back to DAS, we can query the data streamed in real-time
 
-![Kafka topic consumer](images/zeppelin_monitor_sentiment_analysis.png)
+![DAS Query 1](images/das-query-1.png)
+
+![DAS Query 2](images/das-query-2.png)
 
 ## Create live dashboard with Superset
 
