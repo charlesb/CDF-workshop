@@ -503,7 +503,7 @@ mv conf/minifi.properties conf/minifi.properties.bk
 vim conf/minifi.properties
 ```
 
-And copy/paste this [content](https://raw.githubusercontent.com/charlesb/CDF-workshop/master/minifi/minifi.properties)):
+And copy/paste this [content](https://raw.githubusercontent.com/charlesb/CDF-workshop/master/minifi/minifi.properties):
 
 ```properties
 # Core Properties #
